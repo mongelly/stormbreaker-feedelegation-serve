@@ -1,0 +1,20 @@
+{
+    "env":"local",
+    "serviceName":"VeChain Stormbreaker VIP201 Serve",
+    "logLevel":"trace",
+    "logEnvLevel":"local",
+    "port":18050,
+    "thornode_config":{
+        "node_api":"https://sync-mainnet.vechain.org",
+        "confirm_num":12,
+        "chaintag":"0xa4"
+    },
+    "mySqlConfig":{
+        "actived":true,
+        "host":"localhost",
+        "port":3306,
+        "user":"vechain",
+        "password":"vechain",
+        "database":"stormbreaker_feedelegation_serve"
+    }
+}
