@@ -23,6 +23,10 @@ export class RequestInfoVerifyMiddleware extends BaseMiddleware{
                     if(transaction.origin && transaction.origin.toLocaleLowerCase() != ctx.request.body.origin.toLowerCase()){
                         ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20000,message:"origin invalid",datails:undefined});
                     }
+                     if(!transaction.delegated){
+                        ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20004,message:"it's not delegate tx",datails:undefined});
+                     }
+
                     await next();
                 } else {
                     ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20003,message:"chaintag invalid",datails:undefined});

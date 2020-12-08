@@ -6,7 +6,7 @@ import { ConvertJSONResponeMiddleware } from "./convertJSONResponeMiddleware";
 export class AuthorizationVerificationMiddleware extends BaseMiddleware
 {
     public async authorizationVerification(ctx:Router.IRouterContext,next:()=>Promise<any>){
-        let authorization = ctx.header.authorization;
+        let authorization = ctx.query.authorization;
         if(authorization != undefined){
             let am = new AuthorizationManager(this.environment);
             let getInfoResult = await am.getAuthorizationInfo(authorization);

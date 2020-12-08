@@ -16,7 +16,7 @@ export class TransactionFilterMiddleware extends BaseMiddleware
     }
 
     public async transactionFilter(ctx:Router.IRouterContext,next:()=>Promise<any>){
-        let appid = ctx.header.authorization;
+        let appid = ctx.query.authorization;
 
         let configHelp = new CalculateConfigHelper(this.environment);
         let getTreeNodeConfigPromise = configHelp.getCalculateTreeConfig(appid);
