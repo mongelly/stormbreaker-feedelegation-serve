@@ -11,6 +11,8 @@ let config = require(configPath);
 let globalEnvironment:any;
 globalEnvironment = new GlobalEnvironment(config);
 
+globalEnvironment.config.mnemonicFilePath = path.join(__dirname,"../../mnemonic/words");
+
 export let environment = globalEnvironment;
 export let logHelper = (environment as GlobalEnvironment).logHelper;
 
