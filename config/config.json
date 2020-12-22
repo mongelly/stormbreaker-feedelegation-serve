@@ -15,5 +15,7 @@
         "password":"vechain",
         "database":"stormbreaker_feedelegation_serve"
     },
-    "insideSignServeUrl":""
+    "remotesignserve":{
+        "url":"http://localhost:18100"
+    }
 }

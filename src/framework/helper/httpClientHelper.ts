@@ -19,8 +19,7 @@ export class HttpClientHelper
             body:body,
             timeout:40000
         };
-        let debuginfo = `url${url} options ${JSON.stringify(options)}`;
-        console.log(debuginfo);
+        let requestInfo = `url${url} options ${JSON.stringify(options)}`;
         return new Promise((resolve:(result:ActionResultWithData<any>)=>void)=>{
             httpRequest(url,options,(error: any, response: httpRequest.RequestResponse, body: any) =>{
                 let httpResult = new ActionResultWithData<any>();
@@ -30,19 +29,13 @@ export class HttpClientHelper
                 } else if (!response){
                     httpResult.Result = false;
                     httpResult.Code = String(400);
-                    httpResult.Message = `response null ${debuginfo}`;
-                    httpResult.ErrorData = error;
-                }
-                else if (response.statusCode && response.statusCode>=300){
-                    httpResult.Result = false;
-                    httpResult.Code = String(response.statusCode);
-                    httpResult.Message = `response.statusCode && response.statusCode>=300 ${debuginfo}`;
+                    httpResult.Message = `response null ${requestInfo}`;
                     httpResult.ErrorData = error;
                 }
                 else{
                     httpResult.Result = false;
                     httpResult.Code = "-500";
-                    httpResult.Message =`Http request error ${debuginfo}`;
+                    httpResult.Message =`Http request error ${requestInfo}`;
                     httpResult.ErrorData = error;
                 }
                 resolve(httpResult);

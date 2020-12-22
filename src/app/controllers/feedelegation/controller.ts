@@ -1,8 +1,9 @@
 import Router from "koa-router";
 import { BaseMiddleware } from "../../../framework/components/baseMiddleware";
-import DevkitExtension from "../../../framework/helper/devkitExtension";
-import FrameworkErrorDefine from "../../../framework/helper/error";
-import KeyManagement from "../../../server/keyManagement";
+import { iSignServe } from "../../../server/iSignServe";
+import PaymentManagement from "../../../server/paymentManagement";
+import { RemoteSignServe } from "../../../server/remoteSignServe";
+import AppErrorDefine from "../../components/error";
 import { ConvertJSONResponeMiddleware } from "../../middleware/convertJSONResponeMiddleware";
 
 export default class FeeDelegationController extends BaseMiddleware{
@@ -14,16 +15,20 @@ export default class FeeDelegationController extends BaseMiddleware{
         this.sign = async (ctx:Router.IRouterContext,next: () => Promise<any>) => {
             let raw = ctx.request.body.raw;
             let origin = ctx.request.body.origin;
+            let appid = ctx.query.authorization;
 
-            let tx = DevkitExtension.decodeTransaction(raw);
-            let signHash = tx.signingHash(origin);
-
-            let signResult = await (new KeyManagement(this.environment)).sign(signHash,undefined);
-            if(signResult.Result){
-                let signature = signResult.Data!.signature;
-                this.convertSignJSONResult(ctx,signature.toString("hex"));
+            let loadDelegatorResult = await (new PaymentManagement(this.environment)).getDelegator(appid);
+            if(loadDelegatorResult.Result && loadDelegatorResult.Data != undefined && loadDelegatorResult.Data.delegator != undefined){
+                let removeServe:iSignServe = new RemoteSignServe(this.environment);
+                let signResult = await removeServe.sign(raw,origin,loadDelegatorResult.Data.delegator);
+                if(signResult.Result){
+                    let signature = signResult.Data!.signature;
+                    this.convertSignJSONResult(ctx,"0x" + signature.toString("hex"));
+                } else {
+                    ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,AppErrorDefine.SignFaild);
+                }
             } else {
-                ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,FrameworkErrorDefine.INTERNALSERVERERROR);
+                ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,AppErrorDefine.SignFaild);
             }
             await next();
         };
@@ -35,4 +40,5 @@ export default class FeeDelegationController extends BaseMiddleware{
         }
         ConvertJSONResponeMiddleware.BodyToJSONResponce(ctx,body);
     }
+    
 }

@@ -58,3 +58,8 @@ CREATE TABLE IF NOT EXISTS tx_delegation_clauses_index(
 )ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
 ALTER TABLE tx_delegation_clauses_index ADD INDEX toaddress_index (toaddress);
 ALTER TABLE tx_delegation_clauses_index ADD UNIQUE toaddress_clauseindex_index (toaddress,clause_index);
+
+CREATE TABLE IF NOT EXISTS delegator_config(
+    appid VARCHAR(50) NOT NULL,
+    delegator VARCHAR(42) NOT NULL
+)ENGINE=InnoDB DEFAULT CHARSET=utf8 COLLATE=utf8_bin;
