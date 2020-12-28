@@ -1,5 +1,4 @@
 import BaseRequestFilterNode from "../baseRequestFilterNode";
-import * as Devkit from 'thor-devkit'
 
 export class SmartContractWhiteList extends BaseRequestFilterNode{
 

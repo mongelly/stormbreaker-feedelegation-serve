@@ -6,8 +6,12 @@
         "chaintag":"0xa4"
     },
     "dbConfig":{
-        "type":"sqlite",
-        "database":"/Users/moglu/Developer/dataCenter/sqlite/stormbreaker_feedelegation_serve.sqlite3"
+        "type":"mysql",
+        "host":"localhost",
+        "port":3306,
+        "username":"vechain",
+        "password":"vechain",
+        "database":"stormbreaker_feedelegation_serve_orm"
     },
     "logconfig":{
         "logLevel":"trace",

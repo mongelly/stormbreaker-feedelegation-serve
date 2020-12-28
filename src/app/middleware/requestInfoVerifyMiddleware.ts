@@ -1,8 +1,8 @@
 import Router from "koa-router";
 import * as Joi from 'joi';
-import { ConvertJSONResponeMiddleware } from "./convertJSONResponeMiddleware";
-import DevkitExtension from "../../framework/helper/devkitExtension";
-import { BaseMiddleware } from "../../framework/components/baseMiddleware";
+import { BaseMiddleware } from "../../utils/components/baseMiddleware";
+import { ThorDevKitEx } from "../../utils/extensions/thorDevkitExten";
+import ConvertJSONResponeMiddleware from "../../utils/middleware/convertJSONResponeMiddleware";
 
 export class RequestInfoVerifyMiddleware extends BaseMiddleware{
 
@@ -18,24 +18,32 @@ export class RequestInfoVerifyMiddleware extends BaseMiddleware{
         let verify = requestVerifySchema.validate(ctx.request.body,{allowUnknown:true});
         if(!verify.error){
             try {
-                let transaction = DevkitExtension.decodeTransaction(ctx.request.body.raw);
+                let transaction = ThorDevKitEx.decodeTxRaw(ctx.request.body.raw);
                 if(BigInt(transaction.body.chainTag) == BigInt(this.environment.config.thornode_config.chaintag)){
                     if(transaction.origin && transaction.origin.toLocaleLowerCase() != ctx.request.body.origin.toLowerCase()){
-                        ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20000,message:"origin invalid",datails:undefined});
+                        ConvertJSONResponeMiddleware.errorJSONResponce(ctx,RequestInfoVerifyError.ORIGININVALID);
                     }
                      if(!transaction.delegated){
-                        ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20004,message:"it's not delegate tx",datails:undefined});
+                        ConvertJSONResponeMiddleware.errorJSONResponce(ctx,RequestInfoVerifyError.INVALIDDELEGATETX);
                      }
 
                     await next();
                 } else {
-                    ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20003,message:"chaintag invalid",datails:undefined});
+                    ConvertJSONResponeMiddleware.errorJSONResponce(ctx,RequestInfoVerifyError.CHAINTAGINVALID);
                 }
             } catch (error) {
-                ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20001,message:"raw invalid",datails:undefined});
+                ConvertJSONResponeMiddleware.errorJSONResponce(ctx,RequestInfoVerifyError.RAWINVALID);
             }
         } else {
-            ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20002,message:"request body invalid",datails:undefined});
+            ConvertJSONResponeMiddleware.errorJSONResponce(ctx,RequestInfoVerifyError.BADREQUEST);
         }
     }
+}
+
+export class RequestInfoVerifyError{
+    public static ORIGININVALID = new Error("origin invalid");
+    public static INVALIDDELEGATETX = new Error("it's not delegate tx");
+    public static CHAINTAGINVALID = new Error("chaintag invalid");
+    public static RAWINVALID = new Error("raw invalid");
+    public static BADREQUEST = new Error("bad request");
 }

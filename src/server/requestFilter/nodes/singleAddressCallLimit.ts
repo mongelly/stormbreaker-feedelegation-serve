@@ -1,7 +1,7 @@
-import { MysqlHelper } from "../../../framework/helper/mySqlHelper";
 import BaseRequestFilterNode from "../baseRequestFilterNode";
-import { TxDelegationHistoryHelper } from "../../txDelegationHistoryHelper";
-import DateHelper from "../../../framework/helper/dateHelper";
+import { DateEx } from "../../../utils/extensions/dateEx";
+import { TxDelegatorHistoryModel } from "../../model/txDelegationHistoryModel";
+
 
 export class SingleAddressCallLimit extends BaseRequestFilterNode {
 
@@ -16,12 +16,12 @@ export class SingleAddressCallLimit extends BaseRequestFilterNode {
 
         let config = instanceConfig.config as SingleAddressCallLimitConfig;
         let origin = this.context.origin.toLocaleLowerCase();
-        let endTs = DateHelper.getTimeStamp(new Date());
+        let endTs = DateEx.getTimeStamp(new Date());
         let startTs = endTs - config.timeInterval;
-        let historyHelper = new TxDelegationHistoryHelper(this.env);
+        let historyHelper = new TxDelegatorHistoryModel(this.env);
         let queryResult = await historyHelper.selectHistroyCountByOriginAndSignTs(origin,startTs,endTs);
-        if(queryResult.Result && queryResult.Data){
-            return queryResult.Data.count < config.callLimit;
+        if(queryResult.succeed && queryResult.data){
+            return queryResult.data.count < config.callLimit;
         } else {
             return false;
         }

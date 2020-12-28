@@ -1,5 +1,5 @@
 import { Transaction } from "thor-devkit";
-import { BigNumberEx } from "../../../framework/helper/bigNumberEx";
+import { BigNumberEx } from "../../../utils/extensions/bigNumberEx";
 import BaseRequestFilterNode from "../baseRequestFilterNode";
 
 export class GasMax extends BaseRequestFilterNode{

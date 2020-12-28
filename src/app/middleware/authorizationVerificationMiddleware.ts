@@ -1,22 +1,26 @@
 import Router from "koa-router";
-import { BaseMiddleware } from "../../framework/components/baseMiddleware";
-import AuthorizationManager from "../../server/authorizationManager";
-import { ConvertJSONResponeMiddleware } from "./convertJSONResponeMiddleware";
+import AuthorizationModel from "../../server/model/authorizationModel";
+import { BaseMiddleware } from "../../utils/components/baseMiddleware";
+import ConvertJSONResponeMiddleware from "../../utils/middleware/convertJSONResponeMiddleware";
 
 export class AuthorizationVerificationMiddleware extends BaseMiddleware
 {
     public async authorizationVerification(ctx:Router.IRouterContext,next:()=>Promise<any>){
         let authorization = ctx.query.authorization;
         if(authorization != undefined){
-            let am = new AuthorizationManager(this.environment);
+            let am = new AuthorizationModel(this.environment);
             let getInfoResult = await am.getAuthorizationInfo(authorization);
-            if(getInfoResult.Result && getInfoResult.Data != undefined){
+            if(getInfoResult.succeed && getInfoResult.data != undefined){
                 await next();
             } else {
-                ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:"401",message:"Unauthorized",datails:undefined},401);
+                ConvertJSONResponeMiddleware.errorJSONResponce(ctx,AuthorizationError.UNAUTHORIZED);
             }
         } else {
-            ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:"401",message:"Unauthorized",datails:undefined},401);
+            ConvertJSONResponeMiddleware.errorJSONResponce(ctx,AuthorizationError.UNAUTHORIZED);
         }
     }
+}
+
+export class AuthorizationError{
+    public static UNAUTHORIZED = new Error("Unauthorized");
 }

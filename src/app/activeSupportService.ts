@@ -1,32 +1,34 @@
 import { environment } from ".";
-import { ActionResult } from "../framework/components/actionResult";
-import IActiveSupportServices from "../framework/components/iActiveSupportService";
-import { LogHelper } from "../framework/helper/logHelper";
-import { MysqlHelper } from "../framework/helper/mySqlHelper";
+import { ActionResult } from "../utils/components/actionResult";
+import IActiveSupportServices from "../utils/components/iActiveSupportService";
+import { createConnection } from "typeorm";
+import path from "path";
 
 export default class ActiveSupportServices implements IActiveSupportServices{
     public async activieSupportServices():Promise<ActionResult> {
         let result = new ActionResult();
-        result.Result = true;
-        if(environment.config.mySqlConfig.actived){
-            try {
-                let mysqlHelperInstance = new MysqlHelper(environment.config.mySqlConfig);
-                let testResult = await  mysqlHelperInstance.testConnection();
-                if(testResult.Result){
-                    environment.mySqlHelper = mysqlHelperInstance;
-                    result.Result = true;
-                } else {
-                    (environment.logHelper as LogHelper).error(`MySQL [db:${environment.config.mySqlConfig.database}] Connection faild`);
-                    result.Result = false;
-                    return result;
-                }
-            } catch (error) {
-                let errorMsg = `MySQL [db:${environment.config.mySqlConfig.database}] initialize faild`;
-                (environment.logHelper as LogHelper).error(errorMsg);
-                result.ErrorData = errorMsg;
-                result.Result = false;
+        try {
+            const dbConfig = environment.config.dbConfig;
+            const entitiesDir = path.join(__dirname,"../server/*/entities/**.entity{.ts,.js}");
+            const connectionOptions:any = dbConfig;
+            connectionOptions.entities = [entitiesDir];
+            const connection = await createConnection(connectionOptions);
+            if(connection.isConnected){
+                await connection.synchronize();
+                result.succeed = true;
+            } else {
+                let errorMsg = `DataBase [db:${JSON.stringify(environment.config.dbConfig)}] initialize faild`;
+                console.error(errorMsg)
+                result.error = errorMsg;
+                result.succeed = false;
                 return result;
             }
+        } catch (error) {
+            let errorMsg = `DataBase [db:${JSON.stringify(environment.config.dbConfig)}] initialize faild`;
+            console.error(errorMsg)
+            result.error = errorMsg;
+            result.succeed = false;
+            return result;
         }
         return result;
     }

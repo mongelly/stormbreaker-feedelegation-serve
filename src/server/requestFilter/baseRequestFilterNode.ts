@@ -1,5 +1,4 @@
-import { BaseCalculateNode } from '../../framework/calculateEngine/baseCalculateNode';
-
+import { BaseCalculateNode } from "../../utils/calculateEngine/baseCalculateNode";
 export default abstract class BaseRequestFilterNode extends BaseCalculateNode<boolean>
 {
     public id:string = "";

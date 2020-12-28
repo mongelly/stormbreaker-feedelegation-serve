@@ -1,18 +1,18 @@
 import FeeDelegationController from "./controller";
 import { AuthorizationVerificationMiddleware } from "../../middleware/authorizationVerificationMiddleware";
 import { TransactionFilterMiddleware } from "../../middleware/transactionFilterMiddleware";
-import { BaseRouter } from "../../../framework/components/baseRouter";
 import { RequestInfoVerifyMiddleware } from "../../middleware/requestInfoVerifyMiddleware";
+import { BaseRouter } from "../../../utils/components/baseRouter";
 
 export default class FeeDelegationRouter extends BaseRouter
 {
     constructor(env:any){
         super(env);
 
-        let requestInfoVerifyMiddleware = new RequestInfoVerifyMiddleware(env);
-        let authorizationVerificationMiddleware = new AuthorizationVerificationMiddleware(env);
-        let transactionFilterMiddleware = new TransactionFilterMiddleware(env);
-        let feeDelegationController = new FeeDelegationController(env);
+        let requestInfoVerifyMiddleware = new RequestInfoVerifyMiddleware(this.environment);
+        let authorizationVerificationMiddleware = new AuthorizationVerificationMiddleware(this.environment);
+        let transactionFilterMiddleware = new TransactionFilterMiddleware(this.environment);
+        let feeDelegationController = new FeeDelegationController(this.environment);
 
         this.post("/sign",
             (ctx,next) => requestInfoVerifyMiddleware.vip201RequestVerify(ctx,next),

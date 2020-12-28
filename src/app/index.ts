@@ -1,7 +1,8 @@
 import path from "path";
 import ActiveSupportServices from "./activeSupportService";
 import FeeDelegateionServer from "./feedelegationServer";
-import { GlobalEnvironment } from "./globalEnvironment";
+import Environment from "./environment";
+import { initErrorMap } from "./initErrorMap";
 
 process.setMaxListeners(50);
 
@@ -9,24 +10,23 @@ let configPath = path.join(__dirname, "../../config/config.json");
 let config = require(configPath);
 
 let globalEnvironment:any;
-globalEnvironment = new GlobalEnvironment(config);
+globalEnvironment = new Environment(config);
 
-globalEnvironment.config.mnemonicFilePath = path.join(__dirname,"../../mnemonic/words");
+initErrorMap();
 
 export let environment = globalEnvironment;
-export let logHelper = (environment as GlobalEnvironment).logHelper;
 
 (new ActiveSupportServices()).activieSupportServices().then(action => {
-    if(action.Result){
+    if(action.succeed){
         let port = environment.config.port;
         let app = new FeeDelegateionServer(environment);
         app.listen(port);
-        logHelper.info("VeChain TokenSwap Server Active Successful Port:"+port);
+        console.info("VeChain TokenSwap Server Active Successful Port:"+port);
     } else {
-        logHelper.error("Support Active Faild: " + action.Message);
+        console.error("Support Active Faild: " + action.message);
         process.exit();
     }
 }).catch(error => {
-    logHelper.error("Support Active Faild");
+    console.error("Support Active Faild");
     process.exit();
 });

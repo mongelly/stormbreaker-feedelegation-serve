@@ -1,10 +1,13 @@
 import Router from "koa-router";
-import { BaseMiddleware } from "../../../framework/components/baseMiddleware";
 import { iSignServe } from "../../../server/iSignServe";
-import PaymentManagement from "../../../server/paymentManagement";
+import DelegatorManagerModel from "../../../server/model/delegatorManagerModel";
+import { TxDelegatorHistoryModel } from "../../../server/model/txDelegationHistoryModel";
 import { RemoteSignServe } from "../../../server/remoteSignServe";
+import { BaseMiddleware } from "../../../utils/components/baseMiddleware";
+import { SystemDefaultError } from "../../../utils/components/error";
+import { ThorDevKitEx } from "../../../utils/extensions/thorDevkitExten";
+import ConvertJSONResponeMiddleware from "../../../utils/middleware/convertJSONResponeMiddleware";
 import AppErrorDefine from "../../components/error";
-import { ConvertJSONResponeMiddleware } from "../../middleware/convertJSONResponeMiddleware";
 
 export default class FeeDelegationController extends BaseMiddleware{
     public sign:Router.IMiddleware;
@@ -17,18 +20,24 @@ export default class FeeDelegationController extends BaseMiddleware{
             let origin = ctx.request.body.origin;
             let appid = ctx.query.authorization;
 
-            let loadDelegatorResult = await (new PaymentManagement(this.environment)).getDelegator(appid);
-            if(loadDelegatorResult.Result && loadDelegatorResult.Data != undefined && loadDelegatorResult.Data.delegator != undefined){
+            let loadDelegatorResult = await (new DelegatorManagerModel(this.environment)).getDelegator(appid);
+            if(loadDelegatorResult.succeed && loadDelegatorResult.data != undefined && loadDelegatorResult.data.delegator != undefined){
                 let removeServe:iSignServe = new RemoteSignServe(this.environment);
-                let signResult = await removeServe.sign(raw,origin,loadDelegatorResult.Data.delegator);
-                if(signResult.Result){
-                    let signature = signResult.Data!.signature;
-                    this.convertSignJSONResult(ctx,"0x" + signature.toString("hex"));
+                let signResult = await removeServe.sign(raw,origin,loadDelegatorResult.data.delegator);
+                if(signResult.succeed){
+                    let transaction = ThorDevKitEx.decodeTxRaw(raw);
+                    let saveLogResult = await (new TxDelegatorHistoryModel(this.environment)).insertTxDelegation(transaction.body,origin,loadDelegatorResult.data.delegator);
+                    if(saveLogResult.succeed){
+                        let signature = signResult.data!.signature;
+                        this.convertSignJSONResult(ctx,"0x" + signature.toString("hex"));
+                    } else {
+                        ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.INTERNALSERVERERROR);
+                    }
                 } else {
-                    ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,AppErrorDefine.SignFaild);
+                    ConvertJSONResponeMiddleware.errorJSONResponce(ctx,AppErrorDefine.SIGNFAILD);
                 }
             } else {
-                ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,AppErrorDefine.SignFaild);
+                ConvertJSONResponeMiddleware.errorJSONResponce(ctx,AppErrorDefine.SIGNFAILD);
             }
             await next();
         };
@@ -38,7 +47,7 @@ export default class FeeDelegationController extends BaseMiddleware{
         let body:any = {
             signature:signature
         }
-        ConvertJSONResponeMiddleware.BodyToJSONResponce(ctx,body);
+        ConvertJSONResponeMiddleware.bodyToJSONResponce(ctx,body);
     }
     
 }

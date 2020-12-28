@@ -1,13 +1,12 @@
 import Router from "koa-router";
-import { ActionResultWithData } from "../../framework/components/actionResult";
-import { ConvertJSONResponeMiddleware } from "./convertJSONResponeMiddleware";
-import CalculateConfigHelper from "../../server/calculateConfigHelper";
-import PromiseWithActionResultEx from "../../framework/components/promiseWithActionResultEx";
-import FrameworkErrorDefine from "../../framework/helper/error";
 import path from "path";
-import CalculateEngine from "../../framework/calculateEngine/calculateEngine";
-import DevkitExtension from "../../framework/helper/devkitExtension";
-import { BaseMiddleware } from "../../framework/components/baseMiddleware";
+import { BaseMiddleware } from "../../utils/components/baseMiddleware";
+import { ActionData, PromiseActionResult } from "../../utils/components/actionResult";
+import CalculateEngine from "../../utils/calculateEngine/calculateEngine";
+import { ThorDevKitEx } from "../../utils/extensions/thorDevkitExten";
+import ConvertJSONResponeMiddleware from "../../utils/middleware/convertJSONResponeMiddleware";
+import { SystemDefaultError } from "../../utils/components/error";
+import CalculateConfigModel from "../../server/calculate/calculateConfigModel";
 
 export class TransactionFilterMiddleware extends BaseMiddleware
 {
@@ -18,43 +17,48 @@ export class TransactionFilterMiddleware extends BaseMiddleware
     public async transactionFilter(ctx:Router.IRouterContext,next:()=>Promise<any>){
         let appid = ctx.query.authorization;
 
-        let configHelp = new CalculateConfigHelper(this.environment);
+        let configHelp = new CalculateConfigModel(this.environment);
         let getTreeNodeConfigPromise = configHelp.getCalculateTreeConfig(appid);
         let getInstanceConfigPromise = configHelp.getCalculateInstanceConfig(appid);
 
-        let quaryResult = await PromiseWithActionResultEx.ReturnActionResult(Promise.all([getTreeNodeConfigPromise,getInstanceConfigPromise]));
-        if(quaryResult.Result && quaryResult.Data){
-            let treeConfig = (quaryResult.Data.succeed[0] as ActionResultWithData<any>).Data.treeNodeConfig;
-            let instanceConfig = (quaryResult.Data.succeed[1] as ActionResultWithData<any>).Data.instanceConfig;
+        let quaryResult = await PromiseActionResult.PromiseActionResult(Promise.all([getTreeNodeConfigPromise,getInstanceConfigPromise]));
+        if(quaryResult.succeed && quaryResult.data){
+            let treeConfig = (quaryResult.data.succeed[0] as ActionData<any>).data.treeNodeConfig;
+            let instanceConfig = (quaryResult.data.succeed[1] as ActionData<any>).data.instanceConfig;
             let libraryPath:Array<string> = [
-                path.join(__dirname,"../../framework/calculateEngine/baseCalculateNode"),
+                path.join(__dirname,"../../utils/calculateEngine/baseCalculateNode"),
                 path.join(__dirname,"../../server/requestFilter/nodes")];
 
             let calculateEngine = new CalculateEngine(this.environment);
-            let libraries = (await calculateEngine.loadCalculateLibrary(treeConfig,libraryPath)).Data!;
-            let calculateNode = (await calculateEngine.createCalculate(treeConfig,instanceConfig,libraries)).Data!;
+            let libraries = (await calculateEngine.loadCalculateLibrary(treeConfig,libraryPath)).data!;
+            let calculateNode = (await calculateEngine.createCalculate(treeConfig,instanceConfig,libraries)).data!;
 
             let context = {
                 appid:appid,
-                txBody:DevkitExtension.decodeTransaction(ctx.request.body.raw).body,
-                origin:(ctx.request.body.origin as string).toLowerCase()
+                txBody:ThorDevKitEx.decodeTxRaw(ctx.request.body.raw).body,
+                origin:(ctx.request.body.origin as string).toLowerCase(),
+                recaptcha:(ctx.query.recaptcha as string)
             }
-
-            let execResult = await calculateEngine.execCalculate<boolean>(context,calculateNode);
-            if(execResult.Result){
-                if(execResult.Data){
-                    await next();
+            
+            try {
+                let execResult = await calculateEngine.execCalculate<boolean>(context,calculateNode);
+                if(execResult.succeed){
+                    if(execResult.data){
+                        await next();
+                    } else {
+                        ConvertJSONResponeMiddleware.errorJSONResponce(ctx,REFUSETOSIGN);
+                    }
+                    
                 } else {
-                    ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,{code:20005,message:"refuse to sign",datails:undefined});
+                    ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.INTERNALSERVERERROR);
                 }
-                
-            } else {
-                ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,FrameworkErrorDefine.INTERNALSERVERERROR);
+            } catch (error) {
+                ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.INTERNALSERVERERROR);
             }
         } else {
-            ConvertJSONResponeMiddleware.KnowErrorJSONResponce(ctx,FrameworkErrorDefine.INTERNALSERVERERROR);
+            ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.INTERNALSERVERERROR);
         }
     }
-
-    private env:any|undefined;
 }
+
+export let REFUSETOSIGN = new Error("refuse to sign");

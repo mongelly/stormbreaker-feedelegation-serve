@@ -1,9 +1,8 @@
-import { ActionResultWithData } from "../framework/components/actionResult";
-import { HttpClientHelper } from "../framework/helper/httpClientHelper";
 import { iSignServe } from "./iSignServe";
-import * as Path from 'path';
 import AppErrorDefine from "../app/components/error";
-import { HexStringHelper } from "../framework/helper/hexStringHelper";
+import { ActionData } from "../utils/components/actionResult";
+import { HttpClientHelper } from "../utils/helper/httpClientHelper";
+import { HexStringHelper } from "../utils/helper/hexStringHelper";
 
 export class RemoteSignServe implements iSignServe{
 
@@ -11,22 +10,23 @@ export class RemoteSignServe implements iSignServe{
         this.env = env;
         this.url = this.env.config.remotesignserve.url;
     }
-    public async sign(txRaw: string, origin:string,delegator: string): Promise<ActionResultWithData<{ signature: Buffer; }>> {
-        let result = new ActionResultWithData<{ signature: Buffer; }>();
+    public async sign(txRaw: string, origin:string,delegator: string): Promise<ActionData<{ signature: Buffer; }>> {
+        let result = new ActionData<{ signature: Buffer; }>();
         let apiUrl = this.url + "/sign"
-        let httpClient = new HttpClientHelper(apiUrl);
+        let httpClient = new HttpClientHelper();
         let body:any = {
             raw:txRaw,
             delegator:delegator,
             origin:origin
         }
-        let requestResult = await httpClient.doRequest("POST",undefined,undefined,body);
-        if(requestResult.Result && requestResult.Data != undefined){
-            let signature = requestResult.Data["signature"] as string;
-            result.Data = { signature: HexStringHelper.ConvertToBuffer(signature) };
-            result.Result = true
+        let requestResult = await httpClient.request(apiUrl,"POST",undefined,undefined,body);
+        if(requestResult.succeed && requestResult.data != undefined){
+            let signature = requestResult.data.body["signature"] as string;
+            result.data = { signature: HexStringHelper.ConvertToBuffer(signature) };
+            result.succeed = true
         } else {
-            result.initKnowError(AppErrorDefine.SignFaild);
+            result.error = AppErrorDefine.SIGNFAILD;
+            result.succeed = false;
         }
         return result;
     }

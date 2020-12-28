@@ -1,8 +1,9 @@
 import Koa from 'koa';
-import { URLCodeMiddleware } from '../framework/middleware/uricodeMiddleware';
 import RootRouter from './rootRouter';
 import bodyParser from "koa-bodyparser"
 import cors = require('koa2-cors');
+import { URLCodeMiddleware } from '../utils/middleware/uricodeMiddleware';
+import HttpLoggerMiddleware from '../utils/middleware/logMiddleware';
 
 export default class FeeDelegateionServer extends Koa
 {
@@ -21,7 +22,7 @@ export default class FeeDelegateionServer extends Koa
         }));
         this.use(URLCodeMiddleware.URLDecoder);
         this.use(bodyParser());
-        this.use(env.logHelper.httpLogger);
+        this.use(HttpLoggerMiddleware.httpLogger);
         this.use(rootRouter.routes()).use(rootRouter.allowedMethods());
         
     }

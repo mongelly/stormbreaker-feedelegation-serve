@@ -1,6 +1,6 @@
 import Router from "koa-router";
-import { ActionResultWithData } from "../../../framework/components/actionResult";
-import { HttpClientHelper } from "../../../framework/helper/httpClientHelper";
+import { ActionData } from "../../../utils/components/actionResult";
+import { HttpClientHelper } from "../../../utils/helper/httpClientHelper";
 import BaseRequestFilterNode from "../baseRequestFilterNode";
 
 export class GoogleRecaptchaCheck extends BaseRequestFilterNode{
@@ -16,43 +16,45 @@ export class GoogleRecaptchaCheck extends BaseRequestFilterNode{
 
         let recaptchaConfig = config.config as GoogleRecaptchaConfig;
         let secret = recaptchaConfig.secret;
-        let responseToken = (this.context.ctx as Router.IRouterContext).response.headers["token"];
+        let recaptchaToken = this.context.recaptcha;
 
         if(secret == undefined || secret.length == 0){
             throw new Error(`can't found config.secret`);
         }
 
-        if(responseToken == undefined || responseToken.length == 0){
+        if(recaptchaToken == undefined || recaptchaToken.length == 0){
             throw new Error(`can't load token from response`);
         }
 
-        // let verifyResult = await this.verifyAPI(secret,responseToken);
-        // if(verifyResult.Result){
-        //     return verifyResult.Data!;
-        // } else {
-        //     return false;
-        // }
-
-        return true
+        let verifyResult = await this.verifyAPI(secret,recaptchaToken);
+        if(verifyResult.succeed && verifyResult.data){
+            return true;
+        }
+        return false;
     }
 
-    private async verifyAPI(secret:string,responseToken:string):Promise<ActionResultWithData<boolean>>{
-        let result = new ActionResultWithData<boolean>();
+    private async verifyAPI(secret:string,recaptchaToken:string):Promise<ActionData<boolean>>{
+        let result = new ActionData<boolean>();
         let apiUrl = "https://www.google.com/recaptcha/api/siteverify";
-        let httpClient = new HttpClientHelper(apiUrl);
-        let body:any = {
-            secret:secret,
-            response:responseToken
-        }
+        let httpClient = new HttpClientHelper();
+        let parames:Map<string,string> = new Map([
+            ["secret",secret],
+            ["response",recaptchaToken]
+        ]);
 
-        let httpResult = await httpClient.doRequest("POST",undefined,undefined,body);
-        if(httpResult.Result){
-            if(httpResult.Data != undefined){
-                result.Data = httpResult.Data["success"] as boolean;
-                result.Result = true;
+        try {
+            let httpResult = await httpClient.request(apiUrl,"POST",parames,undefined,undefined);
+            if(httpResult.succeed){
+                if(httpResult.data != undefined){
+                    result.data = httpResult.data.body["success"] as boolean;
+                    result.succeed = true;
+                }
+            } else {
+                result.copyBase(result);
             }
-        } else {
-            result.copyBase(result);
+        } catch (error) {
+            result.error = error
+            result.succeed = false;
         }
 
         return result;

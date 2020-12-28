@@ -1,5 +1,5 @@
-import { ActionResultWithData } from "../framework/components/actionResult";
+import { ActionData } from "../utils/components/actionResult";
 
 export interface iSignServe{
-    sign(txRaw:string,origin:string,delegator:string):Promise<ActionResultWithData<{signature:Buffer}>>;
+    sign(txRaw:string,origin:string,delegator:string):Promise<ActionData<{signature:Buffer}>>;
 }
