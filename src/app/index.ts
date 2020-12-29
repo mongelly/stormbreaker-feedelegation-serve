@@ -3,6 +3,7 @@ import ActiveSupportServices from "./activeSupportService";
 import FeeDelegateionServer from "./feedelegationServer";
 import Environment from "./environment";
 import { initErrorMap } from "./initErrorMap";
+import NetworkHelper from "../utils/helper/networkHelper";
 
 process.setMaxListeners(50);
 
@@ -21,7 +22,8 @@ export let environment = globalEnvironment;
         let port = environment.config.port;
         let app = new FeeDelegateionServer(environment);
         app.listen(port);
-        console.info("VeChain TokenSwap Server Active Successful Port:"+port);
+        console.info(`${config.serviceName} active successful`);
+        console.info(`Server run at:\r\n - Local: http://localhost:${port} \r\n - Network: http://${NetworkHelper.geIPAddress()}:${port}`);
     } else {
         console.error("Support Active Faild: " + action.message);
         process.exit();
