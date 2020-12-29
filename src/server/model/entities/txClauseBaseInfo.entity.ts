@@ -1,5 +1,5 @@
 import { TxBaseInfo } from "./txBaseInfo.entity";
-import { Entity, Column,PrimaryGeneratedColumn,Index,Unique, ManyToOne, OneToMany, JoinColumn, PrimaryColumn } from "typeorm";
+import { Entity, Column,Index, ManyToOne, JoinColumn, PrimaryColumn } from "typeorm";
 
 @Entity("tx_delegation_clauses_index")
 @Index("to_clauseindex",["toaddress","clause_index"],{unique:false})

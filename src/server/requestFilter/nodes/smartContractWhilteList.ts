@@ -1,5 +1,4 @@
 import BaseRequestFilterNode from "../baseRequestFilterNode";
-
 export class SmartContractWhiteList extends BaseRequestFilterNode{
 
     public readonly nodeID:string = "d0ebe102-8f42-46d3-a31f-aabc0b34b7af";

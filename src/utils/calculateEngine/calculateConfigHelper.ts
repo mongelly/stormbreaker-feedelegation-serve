@@ -1,5 +1,4 @@
 import Joi from "joi";
-
 export class CalculateConfigHelper{
     public static verifyCalculateTreeConfigSchema(config:any):boolean{
         let calculateSubNodeVerifySchema = Joi.object({

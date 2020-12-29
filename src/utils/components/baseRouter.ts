@@ -1,5 +1,4 @@
 import Router from "koa-router";
-
 export abstract class BaseRouter extends Router {
     constructor(environment:any){
         super();

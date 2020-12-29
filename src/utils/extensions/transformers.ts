@@ -1,5 +1,4 @@
 import { FindOperator} from 'typeorm'
-
 interface ValueTransformer<DBType, EntityType> {
     from: (val: DBType) => EntityType,
     to: (val: EntityType) => DBType

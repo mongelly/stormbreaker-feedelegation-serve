@@ -1,6 +1,5 @@
 import {BigNumber} from 'bignumber.js';
 BigNumber.config({ EXPONENTIAL_AT: 1e+9 });
-
 export class BigNumberEx extends BigNumber
 {
     constructor(value:number|string|BigNumber,base?: number|undefined){

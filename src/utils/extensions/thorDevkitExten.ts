@@ -1,9 +1,5 @@
 import * as Devkit from 'thor-devkit'
 import { Transaction } from 'thor-devkit';
-import { blake2b256 } from 'thor-devkit/dist/cry';
-import or from '../calculateEngine/baseCalculateNode/or';
-import { HexStringHelper } from '../helper/hexStringHelper';
-
 export module ThorDevKitEx{
     export function calculateIDWithUnsigned(txBody:Devkit.Transaction.Body,origin:string):string{
         let tx = new Transaction(txBody);

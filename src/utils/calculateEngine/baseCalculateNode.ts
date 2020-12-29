@@ -1,4 +1,3 @@
-import { func } from "joi";
 import { ICalculateInstanceConfig } from "../calculateEngine/calculateInstanceConfig";
 
 export abstract class BaseCalculateNode<R> {
