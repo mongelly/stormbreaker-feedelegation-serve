@@ -35,12 +35,12 @@ export class GoogleRecaptchaCheck extends BaseRequestFilterNode{
 
     private async verifyAPI(secret:string,recaptchaToken:string):Promise<ActionData<boolean>>{
         let result = new ActionData<boolean>();
-        let apiUrl = "https://www.google.com/recaptcha/api/siteverify";
+        let apiUrl = "https://www.recaptcha.net/recaptcha/api/siteverify";
         let httpClient = new HttpClientHelper();
-        let parames:Map<string,string> = new Map([
-            ["secret",secret],
-            ["response",recaptchaToken]
-        ]);
+        let parames:any = {
+            secret:secret,
+            response:recaptchaToken
+        }
 
         try {
             let httpResult = await httpClient.request(apiUrl,"POST",parames,undefined,undefined);
