@@ -7,7 +7,7 @@
     },
     "dbConfig":{
         "type":"sqlite",
-        "database":"/Users/moglu/Developer/dataCenter/sqlite/stormbreaker_feedelegation_serve.sqlite3"
+        "database":"/dataCenter/sqlite/stormbreaker_feedelegation_serve.sqlite3"
     },
     "logconfig":{
         "logLevel":"trace",
