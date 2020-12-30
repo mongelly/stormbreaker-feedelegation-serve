@@ -17,7 +17,7 @@ export default class ConvertJSONResponeMiddleware extends BaseMiddleware{
 
     public static errorJSONResponce(ctx:Router.IRouterContext,error:Error){
         let err = errorMap.get(error);
-        if(err != undefined){
+        if(err == undefined){
             err = errorMap.get(SystemDefaultError.INTERNALSERVERERROR);
         }
         ctx.state = err!.status;

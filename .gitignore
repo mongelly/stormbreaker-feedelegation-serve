@@ -5,3 +5,4 @@ logs/
 *.patch
 .vscode/
 mnemonic/
+config/config.json
