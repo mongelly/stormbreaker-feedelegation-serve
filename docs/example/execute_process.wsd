@@ -1,0 +1,15 @@
+@startuml
+    "faucet_new" -> "fee_delegator_serve":send request
+    "fee_delegator_serve" -> "vip201RequestVerify"
+      group middleware
+      "vip201RequestVerify" -> "vip201RequestVerify":check request parames
+      "vip201RequestVerify" -> "authorizationVerification"
+      "authorizationVerification" -> "authorizationVerification":check authorzationID
+      "authorizationVerification" -> "transactionFilter":check transaction
+      end
+      "transactionFilter" -> "sign"
+      "sign" -> "remove sign serve": send tx,origin,delegator
+      "remove sign serve" -> "remove sign serve": sign tx
+      "remove sign serve" -> "fee_delegator_serve": return signature
+      "fee_delegator_serve" -> "faucet_new": return signature
+@enduml

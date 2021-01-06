@@ -4,7 +4,6 @@
   "description": "",
   "main": "index.js",
   "scripts": {
-    "test": "rm -rf ./dist && tsc -p ./ && mocha --require ts-node/register src/test/*.ts",
     "build": "rm -rf ./dist && tsc -p ./",
     "serve": "rm -rf ./dist && tsc -p ./ && node ./dist/app/index.js"
   },

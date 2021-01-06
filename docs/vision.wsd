@@ -1,0 +1,37 @@
+@startuml
+left to right direction
+frame exchange{
+card cold_wallet
+card hot_wallet1
+card privete_feedelegation_serve
+}
+
+frame public_server1{
+    card faucet_new_DApp
+    card vote_DApp
+    card public_feedelegation_serve_1
+}
+
+frame public_server2{
+    card NFT_DApp
+    card DEX_DApp
+    card Game_DApp
+    card public_feedelegation_serve_2
+}
+
+card VechainThor_Blockchain as chain
+
+hot_wallet1 -> cold_wallet:transfer token
+hot_wallet1 <-- privete_feedelegation_serve:agent to pay VTHO
+faucet_new_DApp <-- public_feedelegation_serve_1:agent to pay VTHO
+vote_DApp <-- public_feedelegation_serve_1
+
+NFT_DApp <-- public_feedelegation_serve_2:agent to pay VTHO
+DEX_DApp <-- public_feedelegation_serve_2
+Game_DApp <-- public_feedelegation_serve_2
+
+
+privete_feedelegation_serve -- chain
+public_feedelegation_serve_1 -- chain
+public_feedelegation_serve_2 -- chain
+@enduml

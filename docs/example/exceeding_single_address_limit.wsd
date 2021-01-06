@@ -1,0 +1,13 @@
+@startuml
+node and_1
+node and_2
+node google_recaptcha
+node smart_contract_whitelist
+node single_address_call_limit
+
+and_1 --[#red]> result:false
+single_address_call_limit --[#red]> and_1:false
+and_2 --[#green]> and_1:true
+google_recaptcha --[#green]> and_2:true
+smart_contract_whitelist --[#green]> and_2:true
+@enduml
