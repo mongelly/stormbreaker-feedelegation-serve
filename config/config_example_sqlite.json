@@ -7,7 +7,8 @@
     },
     "dbConfig":{
         "type":"sqlite",
-        "database":"/dataCenter/sqlite/stormbreaker_feedelegation_serve.sqlite3"
+        "database":"/dataCenter/sqlite/stormbreaker_feedelegation_serve.sqlite3",
+        "enableWAL":true
     },
     "logconfig":{
         "logLevel":"trace",
