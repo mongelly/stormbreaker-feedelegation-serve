@@ -1,5 +1,5 @@
 import { Entity, PrimaryColumn, Column, } from "typeorm";
-import { ICalculateInstanceConfig } from "../../../utils/calculateEngine/calculateInstanceConfig";
+import { InstanceConfig } from "../../../utils/calculateEngine/src/calculateEngine/instanceConfig";
 import { simpleJSON } from "../../../utils/extensions/transformers";
 
 @Entity("calculate_instance_config")
@@ -20,6 +20,6 @@ export class CalculateInstanceConfigEntity{
     @Column({name:"valid"})
     public valid!:boolean;
 
-    @Column({name:"config",type: 'text',transformer:simpleJSON<ICalculateInstanceConfig>("calculate_instance_config.config")})
-    public config!:ICalculateInstanceConfig
+    @Column({name:"config",type: 'text',transformer:simpleJSON<InstanceConfig>("calculate_instance_config.config")})
+    public config!:InstanceConfig
 }
