@@ -5,22 +5,17 @@
 [![](https://badgen.net/badge/storage/sqlite|mysql/blue)]()
 
 > :warning: It just an `Alpha` Version ! Don't use it on the `Production Environment` or `VeChainThor Mainnet`.
+
 ## 1. Introduction
 
-Fee Delegation as a Service (DaaS) is a [VIP201](https://github.com/vechain/VIPs/blob/master/vips/VIP-201.md) implementation. Its target is to become a public and distributed service that provides fee delegation service for dApps and blockchain applications.
+Fee Delegation as a Service (DaaS) is an infrastructure-level module that provides a framework for setting up a fee-delegation service based on the VIP-191 protocol on the VeChain Thor public blockchain. It allows projects to hide the complexity of paying transaction costs from their users entirely, significantly improving the user experience and making them more able to be mass adopted. According to the current design, applications that use the same DaaS services are identified by their authorizationID. The module includes a so-called `Request-Validation-Engine` that allows the service provider to configure different rules for different applications to filter txs. In this way, a single service can serve different applications without customization for each application. To learn more about `Request-Validation-Engine`, you can check this document (coming soon). For demonstration purposes, we have deployed the DaaS module on the testnet to provide the fee-delegation service for the following two applications:
 
-- Public fee delegation serve
-  
-    Every appliction want to use this serve,it need an authorizationID. The service include a calculate engine. It can configure a rule for each application based on the authorizationID and filter the transaction send by application to decide whether to sign. In this way, the service can serve different applications without the need to develop and deploy services for earch application.More about the `Calculate Engine`,you can ref this [Calculate Engine(comming soon)]().
+- [faucet-new(Testnet)](https://github.com/mongelly/faucet-new)
+- Vote(comming soon)
 
-- Distributed serve
+This project is aimed to provide a framework for efficiently setting up a VIP-191 fee-delegation service. We welcome more developers to join and together maintain the project. The figure below gives some examples of how DaaS can be used to provide fee-delegation services on Thor.
 
-    This service has been deployed and provides a fee broker service for the following applications:
-    - [faucet-new(Testnet)](https://github.com/mongelly/faucet-new)
-    - [Vote(comming soon)]()
-
-    But in blockchain world, we don't want all applications to rely on a single service, so we're open source and expect more developers and companies to maintain the project and deploy the service. Provide services for Vechain ecology, which can be combined with `DeFi` in the future.This is a description of our vision:
-    ![image](http://www.plantuml.com/plantuml/png/VLBBReCm4BplL_W7SWZ7gAhIAdsSsaEZg3ThQvPWnGzabgHLr7-lQo81aGCdF3Cx2pDUjuo1Esl0KCM2lGXwNxCeTI35sZke0beIzArgT7iwWy9G2kLDAKze374Fr9udPsnROcdHuPuiEPOjXQDMrBDDq4TYaXl43_Y5ouwc-p9Q9IM5vHb4V9Aymav5DqSdkNbece4uUgOfT359pd9vmxiOURyzRwySDa-VLyWBsharnV-QXEuefgJTjlP1FXgl3kaOmn3f1M28ITmjxiSnhZYWQoiAWls1t5IvcCbpi9WNtYBIrBYGLHIuT1KQ_16xxUixm5K3QMQIT6OebPDN0yJOyroHSKgDPCNGLvFd0CQ_9IBVjp3vb3nS3F2QNDbPymS0)
+![image](http://www.plantuml.com/plantuml/png/VLBBReCm4BplL_W7SWZ7gAhIAdsSsaEZg3ThQvPWnGzabgHLr7-lQo81aGCdF3Cx2pDUjuo1Esl0KCM2lGXwNxCeTI35sZke0beIzArgT7iwWy9G2kLDAKze374Fr9udPsnROcdHuPuiEPOjXQDMrBDDq4TYaXl43_Y5ouwc-p9Q9IM5vHb4V9Aymav5DqSdkNbece4uUgOfT359pd9vmxiOURyzRwySDa-VLyWBsharnV-QXEuefgJTjlP1FXgl3kaOmn3f1M28ITmjxiSnhZYWQoiAWls1t5IvcCbpi9WNtYBIrBYGLHIuT1KQ_16xxUixm5K3QMQIT6OebPDN0yJOyroHSKgDPCNGLvFd0CQ_9IBVjp3vb3nS3F2QNDbPymS0)
 
 ## 2. API
 
@@ -67,26 +62,25 @@ Responses with HTTP status code other than 200 is considered an error.
 
 ## 3. How to use it
 
-The project is a DaaS framework,which has the basic modules and APIs by DaaS.
+Here we talk about how to use the current code to run a fee-delegation service:
 
-However it can't used directly. The developers need to carry out a samll amount of development and configuration.
 ### 1. Development of calculate node
 
-the project already includes some base and common nodes.
+The project already includes some base and common nodes.
 
-- base calculate nodes ()
+- base calculate nodes
 
-    path: `/src/utils/calculateEngine/baseCalculateNode`
+    project path: `/src/utils/calculateEngine/baseCalculateNode`
 
     includes some logical operations nodes.
-    - `Normal`
-    - `And`
-    - `Or`
-    - `Not`
+  - `Normal`
+  - `And`
+  - `Or`
+  - `Not`
 
 - request filter node
   
-  path:`/src/server/requestFilter/nodes`
+  project path:`/src/server/requestFilter/nodes`
 
   includes some common request filter nodes.
   - `GasMax`
@@ -96,18 +90,18 @@ the project already includes some base and common nodes.
   - `TxOriginWhiteList`
   - `TxTargetWhiteList`
 
-Each node has a unique ID - nodeID, if there nodes can't meet the needs of the dApps, you can implement your node, it need follow the [BaseCalculateNode](src/utils/calculateEngine/baseCalculateNode.ts) abstract class, and add the project.
+Each node has a unique ID - nodeID, if the nodes can't meet the needs of your dApp, you can implement your own. However, it needs to follow the `BaseCalculateNode` abstract class, and add to the project.
 
-Some nodes have a instance json config. A node can be configured for different instance json config to adapt to different dApps.
+Some nodes have an instance json config. A node can be configured for different instance json config to adapt to different dApps.
 
-### 2. Regiest a new appid
+### 2. Register a new appid
 
- Each dApp need regiest a appid, which has a `tree node config` and an `instance config`.
+ Each dApp need register an appid, which has a `tree node config` and an `instance config`.
 
    - Generate a appid like this `039be23b-ca50-4b50-97bb-34d9d2ce86ca`.
-   - Add the appid to `authorzation_info` table of database.
+   - Add the appid to the `authorzation_info` table of the built in database.
 
-### 3. Configuration tree node config
+### 3. Configuration of the tree node config
 
 This is a tree node config sample:
 
@@ -167,22 +161,23 @@ This is a tree node config sample:
     ]
 }
 ```
+
 Convert to a tree like this:
 
 ![image](http://www.plantuml.com/plantuml/png/TOun2iCm34Ltdy8NoD2C7Kfk8bHR90PPAhPChz_MAIwKP1F_lu_UKWsBjSnED997YN3vdVD-hgeh4nGA-B2muPxMZCKWg5Z1OF3SaX6dQjysoMU3CHQg5G8o0wUSpBd-n4_JpR-hndQzgpAXkDDDX_jii5tl8Fzt7SWya3Fn0tGXYItp2m00)
 
 - Tree node config description
-  - `root`      It's a tree root node.
-  - `node`      It's a node's name,just an alias
-  - `inputs`    Some nodes can support child nodes or receive a value.
-      - `inputs.type`   Support `ref` and `value`
-      - `inputs.value`  When type is `ref`, the value is a instanceid,`references` will contain the node with this instanceid. When type is `value`, the value is a json value or json object.
-  - `nodeid`    It's a node unique ID, the service will find the node class based on this ID.
-  - `instanceid` Each node has an instanceid in the file,which is used to find corresponding configuration in `references` or match it in `instance config json`.
+  - `root`      root node.
+  - `node`      node's name,just an alias
+  - `inputs`    some nodes can support child nodes or receive a value.
+      - `inputs.type`   supports `ref` and `value`
+      - `inputs.value`  when type is `ref`, the value is an instanceid,`references` will contain the node with this instanceid. When type is `value`, the value is a json value or json object.
+  - `nodeid`    node's unique ID based on which, the service will find the node class.
+  - `instanceid` each node has an instanceid in the file,which is used to find corresponding configuration in `references` or match it in `instance config json`.
 
-When finish the `tree node config`,add json to `calculate_tree_config` table of database. It needs to be associated with an appid.
+When finishing the `tree node config`,add json to the `calculate_tree_config` table. It needs to be associated with an appid.
 
-### 4. Configuration instance config
+### 4. Configuration of instance config
 
 This is a instance config sample:
 
@@ -220,23 +215,23 @@ This is a instance config sample:
 }
 ```
 
-The config in each `configs` is associated with the node in the `tree node config` via `instanceid`. The framework uses a unified function to manage `instance config` for each `appid`.
+The configuration in each `configs` is associated with the node in the `tree node config` via `instanceid`. The framework uses a unified function to manage `instance config` for each `appid`.
 
-When finish the `instance config`,add json to `calculate_instance_config` table of database. It needs to be associated with an appid.
+When finishing the `instance config`,add json to the `calculate_instance_config` table. It needs to be associated with an appid.
 
-### 5. Development of remote sign serve
+### 5. Development of remote signing service
 
-The server has a remote sign service, the server is used to protect the delegator private key. The server isn't open source,because each resellers has different security rules and implementation for the private key.
+The server requireshas a separate remote signing service that, the server is used to protects the service provider’s delegator private key. We decide not to implement theThe signing serviceserver isn't open source, sincebecause each service provider may have resellers has different security rules and implementation for the private key management.
 
-The framework include a [signServe interface](src/server/iSignServe.ts) and an [implementation](src/server/remoteSignServe.ts).
+The framework includes a signing Service interface and BE AWARE that the current implementation should NOT be used in production.
 
 ## 4.Execute process
 
-  process
+  The figure below illustrates the interaction between the faucet contract and DaaS serviceProcess:
 
-  ![image](http://www.plantuml.com/plantuml/png/ZP8nJyCm48LtViKfSv60iGFgW91O6LYZK_oQMiHsE9_Jmg-dTHpK8LR9vBjxtzD5ztPHMJIvuOxENxFdr45RZsD3zy_d6cWD1lIiGTe8cT1i8xmXmLT2r8ojoZ8_sV7fuV5zrdv0xFwxoGXHBo6DvAmn0uuiAErLfEgrxGxeFfTbQ6HXXtZJYfCUWjWVLXjy7jWklvVbwefR1cMZMJ3Ftrx-wQh2Fd9tQRpQGI6BszMWMC6RybgXibcq_V8xfSXjWGiJwDAWSa_A1zNJ9eZjhT_yNRBGAqpLAXTwgfFrM950a_WiPaqb4VLqNQUrHk_WJNB3Bm00)
+  ![image](http://www.plantuml.com/plantuml/png/bPB1IiD048RlVOfXpnNKOm_IGn6yAdWjm-uq7Kncu-nigpwzSPTWaPXeJilyttmCuTycGxNSjIiOFdV0xCdsGcS7LtVWTeXFU-pPRH990ANNJCagEsQLF75_UttpM85dKZwyky81D1fp3ns7qD8PbUfuUkLNryOVoR-C5q2FYXsbHHLcEqRb3pIEKWBsvJqUDqFC2yQBAb3pXzqVhQOe2VtNu9vR8nrj5q5LJR7_LP24rPmgSICi3IJI4ti2bY4weAVoa-RoigxKHIFuGRaDbCxOspegDophG2qrQ56BTNfjKJbC1kMouRkve6HPfM0ul6YglXV5drZOaeJSjPy0)
 
-1. send a delegator request
+1. send service request
 
   ``` http
   POST /sign HTTP/1.1 localhost:18050/sign?authorization=c16499***********4389328704&recaptcha=-BS0b5*******AGGY3
@@ -247,7 +242,10 @@ The framework include a [signServe interface](src/server/iSignServe.ts) and an [
   }
   ```
 
-2. `RequestInfoVerifyMiddleware.vip201RequestVerify`,check the request parames are valid.
-3. `AuthorizationVerificationMiddleware.authorizationVerification`,check authorzationID valid.
-4. the engine will found `tree config` and `instance config` by authorizationID, and create the a tree instance.
-5. `TransactionFilterMiddleware.transactionFilter`, use engine to check the rules.
+2. `RequestInfoVerifyMiddleware.vip201RequestVerify` is a built in middleware,it checks if request parameter are valid.
+
+3. `AuthorizationVerificationMiddleware.authorizationVerification` is a built in middleware, it checks if authorizationID is valid.
+
+4. The engine will find `tree config` and `instance config` by authorizationID, and creates thee instance.
+
+5. `TransactionFilterMiddleware.transactionFilter`,is a built in middleware, it use the `Request-Validation-Engine` to check the rules.
