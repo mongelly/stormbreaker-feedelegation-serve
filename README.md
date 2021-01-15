@@ -227,7 +227,7 @@ The framework includes a signing Service interface and BE AWARE that the current
 
 ## 4.Execute process
 
-  The figure below illustrates the interaction between the faucet contract and DaaS serviceProcess:
+  The figure below illustrates the interaction between the faucet contract and DaaS service:
 
   ![image](http://www.plantuml.com/plantuml/png/bPB1IiD048RlVOfXpnNKOm_IGn6yAdWjm-uq7Kncu-nigpwzSPTWaPXeJilyttmCuTycGxNSjIiOFdV0xCdsGcS7LtVWTeXFU-pPRH990ANNJCagEsQLF75_UttpM85dKZwyky81D1fp3ns7qD8PbUfuUkLNryOVoR-C5q2FYXsbHHLcEqRb3pIEKWBsvJqUDqFC2yQBAb3pXzqVhQOe2VtNu9vR8nrj5q5LJR7_LP24rPmgSICi3IJI4ti2bY4weAVoa-RoigxKHIFuGRaDbCxOspegDophG2qrQ56BTNfjKJbC1kMouRkve6HPfM0ul6YglXV5drZOaeJSjPy0)
 
