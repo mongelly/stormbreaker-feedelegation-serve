@@ -79,15 +79,15 @@ export class TxDelegatorHistoryModel{
             .andWhere("tx.signts <= :endts",{endts:filter.endts});
 
             if(filter.origins.length > 0){
-                builder.andWhere("tx.origin IN (:...origins)",{origins:filter.origins});
+                builder.andWhere("tx.origin IN (:....origins)",{origins:filter.origins});
             }
 
             if(filter.delegators.length > 0){
-                builder.andWhere("tx.delegator IN (:...delegators)",{delegators:filter.delegators});
+                builder.andWhere("tx.delegator IN (:....delegators)",{delegators:filter.delegators});
             }
 
             if(filter.toAddresses.length > 0){
-                builder.andWhere("tx_delegation_clauses_index.toaddress IN (:...toaddress)",{toaddress:filter.toAddresses});
+                builder.andWhere("tx_delegation_clauses_index.toaddress IN (:....toaddress)",{toaddress:filter.toAddresses});
             }
 
             builder.orderBy("tx.signts",filter.sort)

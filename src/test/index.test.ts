@@ -8,7 +8,8 @@ describe('TxDelegatorHistoryModel Test', () => {
     const dbConfig = {
         type:"sqlite",
         database:"/Users/moglu/Developer/dataCenter/sqlite/stormbreaker_feedelegation_serve.sqlite3",
-        enableWAL:true
+        enableWAL:true,
+        logging:true
     }
     const entitiesDir = path.join(__dirname,"../server/*/entities/**.entity{.ts,.js}");
     const connectionOptions:any = dbConfig;
