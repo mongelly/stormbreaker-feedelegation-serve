@@ -25,13 +25,15 @@
     "koa-bodyparser": "^4.3.0",
     "koa-router": "^9.4.0",
     "koa2-cors": "^2.0.6",
+    "koa2-swagger-ui": "^5.0.5",
     "log4js": "^6.3.0",
     "mysql": "^2.18.1",
     "path": "^0.12.7",
     "sqlite3": "^5.0.0",
     "thor-devkit": "^1.2.5",
     "typeorm": "^0.2.29",
-    "uuid": "^8.3.1"
+    "uuid": "^8.3.1",
+    "yamljs": "^0.3.0"
   },
   "devDependencies": {
     "@types/assert": "^1.5.3",
@@ -46,6 +48,7 @@
     "@types/mysql": "^2.15.15",
     "@types/node": "^14.14.14",
     "@types/uuid": "^8.3.0",
+    "@types/yamljs": "^0.2.31",
     "i": "^0.3.6",
     "mocha": "^8.2.1",
     "npm": "^6.14.10",

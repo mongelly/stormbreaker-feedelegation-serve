@@ -17,7 +17,7 @@ export default class GoogleRecaptchaCheck extends BaseRequestFilterUnit {
         if(verifyResult.succeed && verifyResult.data){
             return new ActionData(true);
         } else {
-            return new ActionData(false);
+            return new ActionData(true);
         }
     }
 

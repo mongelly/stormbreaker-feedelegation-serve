@@ -1,0 +1,72 @@
+openapi: 3.0.1
+info:
+  title: FeeDelegation Service
+  description: ''
+  license:
+    name: LGPL 3.0
+    url: 'https://www.gnu.org/licenses/lgpl-3.0.en.html'
+  version: 1.0.0
+
+servers:
+  - url: '/'
+    description: local service
+
+tags:
+  - name: Sign
+    description: sign for VIP191 transaction
+    
+paths:
+  /sign:
+    post:
+      tags:
+        - "Sign"
+      summary: "Sign for VIP191 transaction"
+      parameters:
+        - in: query
+          name: authorization
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: recaptcha
+          schema:
+            type: string
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+               schema:
+                $ref: '#/components/schemas/Signature'
+
+components:
+  schemas:
+    SignRequest:
+      description: "sign for VIP191 transaction"
+      properties:
+        raw:
+          type: string
+          description: hex form of encoded transaction
+          format: bytes
+          example: '0xf7278778f3e100d299a812dcdb942b990f387b513f6afa6b87a73f6533f2f19407ce80844e71d92d8082ea608088d5bbec1195eea92dc101'
+        origin:
+          type: string
+          description: origin of transaction
+          format: bytes20
+          example: '0x7567d83b7b8d80addcb281a71d54fc7b3364ffed'
+    
+    Signature:
+      description: "signature"
+      properties:
+        signature:
+            type: string
+            format: bytes130
+            example: 'f8fe82c74f9e1f5bf443f8a7f8eb968140f554968fdcab0a6ffe904e451c8b9244be44bccb1feb34dd20d9d8943f8c131227e55861736907b02d32c06b934d7200'
+
