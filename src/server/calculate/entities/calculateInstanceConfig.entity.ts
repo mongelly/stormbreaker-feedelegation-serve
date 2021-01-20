@@ -8,8 +8,8 @@ export class CalculateInstanceConfigEntity{
     @PrimaryColumn({name:"appid",length:50})
     public appid!:string
 
-    @Column({name:"instanceid",length:50})
-    public instanceid!:string;
+    @Column({name:"configid",length:50})
+    public configid!:string;
 
     @Column({name:"createts"})
     public createts!:number;

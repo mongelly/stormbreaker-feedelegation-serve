@@ -34,38 +34,6 @@ export class TxDelegatorHistoryModel{
         return result;
     }
 
-    public async selectHistoryByOriginAndSignTs(origin:string,starts:number,endts:number = DateEx.getTimeStamp(new Date()),includeClause:boolean = false,offset:number = 0,limit:number = 50):Promise<ActionData<{history:Array<TxBaseInfo>}>>{
-        let result = new ActionData<{history:Array<TxBaseInfo>}>()
-
-        try {
-            let connection = getConnection();
-            let builder = connection
-            .getRepository(TxBaseInfo)
-            .createQueryBuilder("tx")
-            .where("tx.origin = :origin",{origin:origin.toLowerCase()})
-            .andWhere("tx.signts >= :starts",{starts:starts})
-            .andWhere("tx.signts <= :endts",{endts:endts})
-            .orderBy("tx.signts","DESC")
-            .limit(limit)
-            .offset(offset)
-
-            if(includeClause){
-                builder.leftJoinAndSelect("tx.clauses","clause")
-            }
-
-            let baseinfos = await builder.getMany();
-
-            result.data = {history:baseinfos};
-            result.succeed = true;
-
-        } catch (error) {
-            result.error = new Error(`selectHistoryByOriginAndSignTs faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
-        }
-
-        return result;
-    }
-
     public async selectHistroyByFilter(filter:TxFilter,includeClause:boolean = false):Promise<ActionData<{history:Array<TxBaseInfo>}>>{
         let result = new ActionData<{history:Array<TxBaseInfo>}>();
 
@@ -79,15 +47,15 @@ export class TxDelegatorHistoryModel{
             .andWhere("tx.signts <= :endts",{endts:filter.endts});
 
             if(filter.origins.length > 0){
-                builder.andWhere("tx.origin IN (:....origins)",{origins:filter.origins});
+                builder.andWhere("tx.origin IN (:...origins)",{origins:filter.origins});
             }
 
             if(filter.delegators.length > 0){
-                builder.andWhere("tx.delegator IN (:....delegators)",{delegators:filter.delegators});
+                builder.andWhere("tx.delegator IN (:...delegators)",{delegators:filter.delegators});
             }
 
             if(filter.toAddresses.length > 0){
-                builder.andWhere("tx_delegation_clauses_index.toaddress IN (:....toaddress)",{toaddress:filter.toAddresses});
+                builder.andWhere("tx_delegation_clauses_index.toaddress IN (:...toaddress)",{toaddress:filter.toAddresses});
             }
 
             builder.orderBy("tx.signts",filter.sort)

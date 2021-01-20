@@ -1,15 +1,16 @@
 @startuml
-    "faucet_new" -> "fee_delegator_serve":send request
-    "fee_delegator_serve" -> "vip201RequestVerify"
+    "faucet_new" -> "DaaS_api":send request
+    "DaaS_api" -> "vip201RequestVerify"
       group middleware
       "vip201RequestVerify" -> "vip201RequestVerify":check request parames
       "vip201RequestVerify" -> "authorizationVerification"
       "authorizationVerification" -> "authorizationVerification":check authorzationID
       "authorizationVerification" -> "transactionFilter":check transaction
+      "transactionFilter" -> "transactionFilter":check transaction
       end
-      "transactionFilter" -> "sign"
-      "sign" -> "remove sign serve": send tx,origin,delegator
-      "remove sign serve" -> "remove sign serve": sign tx
-      "remove sign serve" -> "fee_delegator_serve": return signature
-      "fee_delegator_serve" -> "faucet_new": return signature
+    "transactionFilter" -> "signing service interface"
+    "signing service interface" -> "remote signing service": send tx,origin,delegator
+    "remote signing service" -> "remote signing service": sign tx
+    "remote signing service" -> "DaaS_api": return signature
+    "DaaS_api" -> "faucet_new": return signature
 @enduml

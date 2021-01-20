@@ -93,7 +93,7 @@ export default class CalculateConfigModel{
             .getOne()
 
             if(data != undefined){
-                result.data = {instanceid:data.instanceid,instanceConfig:data.config}
+                result.data = {instanceid:data.configid,instanceConfig:data.config}
             }
             result.succeed = true;
         } catch (error) {
@@ -108,7 +108,7 @@ export default class CalculateConfigModel{
         let result = new ActionData<{instanceid:string}>();
 
         let config = new CalculateInstanceConfigEntity();
-        config.instanceid = uuid();
+        config.configid = uuid();
         config.appid = appid;
         config.createts = DateEx.getTimeStamp();
         config.updatets = config.createts;
@@ -118,7 +118,7 @@ export default class CalculateConfigModel{
         try {
             await getManager()
             .save(config);
-            result.data = {instanceid:config.instanceid}
+            result.data = {instanceid:config.configid}
             result.succeed = true;
         } catch (error) {
             result.error = new Error(`saveCalculateInstanceConfig faild: ${JSON.stringify(error)}`);

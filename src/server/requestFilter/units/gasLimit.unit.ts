@@ -18,7 +18,7 @@ export default class GasLimit extends BaseRequestFilterUnit{
             return new ActionData(true);
         } else {
             let result = new ActionData(false);
-            result.message = "tx gas is too large";
+            result.error = new Error("tx gas is too large");
             return result;
         }
     }
