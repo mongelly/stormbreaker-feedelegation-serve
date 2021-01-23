@@ -86,7 +86,8 @@ export class TxDelegatorHistoryModel{
             let connection = getConnection();
             let builder = await connection
             .getRepository(TxBaseInfo)
-            .createQueryBuilder()
+            .createQueryBuilder("tx")
+            .select("COUNT(tx.txid)","count")
             .innerJoin("tx.clauses","tx_delegation_clauses_index")
             .where("signts >= :starts",{starts:filter.starts})
             .andWhere("signts <= :endts",{endts:filter.endts});
@@ -109,7 +110,7 @@ export class TxDelegatorHistoryModel{
             result.succeed = true;
 
         } catch (error) {
-            result.error = new Error(`selectHistroyByFilter faild: ${JSON.stringify(error)}`);
+            result.error = new Error(`selectHistoryCountByFilter faild: ${JSON.stringify(error)}`);
             result.succeed = false;
         }
 

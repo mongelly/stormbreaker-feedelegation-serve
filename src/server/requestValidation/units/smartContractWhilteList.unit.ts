@@ -1,9 +1,9 @@
 import Joi from "joi";
 import { CalculateUnitCtx } from "../../../utils/calculateEngine/src/calculateEngine/baseCalculateUnit";
 import { ActionData, ActionResult } from "../../../utils/calculateEngine/src/utils/components/actionResult";
-import BaseRequestFilterUnit from "../baseRequestFilterUnit";
+import BaseRequestValidationUnit from "../baseRequestValidationUnit";
 
-export class SmartContractWhiteList extends BaseRequestFilterUnit{
+export default class SmartContractWhiteList extends BaseRequestValidationUnit{
 
     public readonly unitID:string = "d0ebe102-8f42-46d3-a31f-aabc0b34b7af";
     public readonly unitName:string = "Smart contract whitelistit";
@@ -30,10 +30,13 @@ export class SmartContractWhiteList extends BaseRequestFilterUnit{
     }
 
     public async checkCtx(ctx: CalculateUnitCtx): Promise<ActionResult> {
-        const configSchema = Joi.array().items({
-            address:Joi.string().lowercase().length(42).regex(/^(-0x|0x)[0-9a-f]*$/).required(),
-            functionHashs:Joi.array().items(Joi.string().lowercase().length(10).regex(/^(-0x|0x)[0-9a-f]*$/))
-        }).required();
+        const configSchema = Joi.object({
+            smartcontract_whitelist:Joi.array().items({
+                address:Joi.string().lowercase().length(42).regex(/^(-0x|0x)[0-9a-f]*$/).required(),
+                functionHashs:Joi.array().items(Joi.string().lowercase().length(10).regex(/^(-0x|0x)[0-9a-f]*$/))
+            })
+        });
+
         const verify = configSchema.validate(ctx.instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
             return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));

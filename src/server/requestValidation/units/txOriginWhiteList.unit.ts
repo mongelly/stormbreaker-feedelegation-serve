@@ -1,12 +1,12 @@
 import { CalculateUnitCtx } from "../../../utils/calculateEngine/src/calculateEngine/baseCalculateUnit";
 import { ActionData, ActionResult } from "../../../utils/calculateEngine/src/utils/components/actionResult";
-import BaseRequestFilterUnit from "../baseRequestFilterUnit";
+import BaseRequestValidationUnit from "../baseRequestValidationUnit";
 import Joi from "joi";
 
-export default class TxOriginWhiteList extends BaseRequestFilterUnit {
+export default class TxOriginWhiteList extends BaseRequestValidationUnit {
 
-    public readonly nodeID:string = "8052e3c7-0a00-4047-a53e-a27841db5dd7";
-    public readonly nodeName:string = "Tx origin whitelist";
+    public readonly unitID:string = "8052e3c7-0a00-4047-a53e-a27841db5dd7";
+    public readonly unitName:string = "Tx origin whitelist";
 
     public async calculate(ctx: CalculateUnitCtx): Promise<ActionData<boolean>> {
         const config = ctx.instanceConfig as Array<string>;
@@ -24,5 +24,4 @@ export default class TxOriginWhiteList extends BaseRequestFilterUnit {
         }
         return new ActionResult(true);
     }
-
 }

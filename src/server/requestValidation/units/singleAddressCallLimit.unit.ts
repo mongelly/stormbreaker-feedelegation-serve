@@ -3,11 +3,11 @@ import { CalculateUnitCtx } from "../../../utils/calculateEngine/src/calculateEn
 import { ActionData, ActionResult } from "../../../utils/calculateEngine/src/utils/components/actionResult";
 import { DateEx } from "../../../utils/extensions/dateEx";
 import { TxDelegatorHistoryModel, TxFilter } from "../../model/txDelegationHistoryModel";
-import BaseRequestFilterUnit from "../baseRequestFilterUnit";
+import BaseRequestValidationUnit from "../baseRequestValidationUnit";
 import * as Joi from 'joi';
 
 
-export default class SingleAddressCallLimit extends BaseRequestFilterUnit {
+export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
 
     public readonly unitID:string = "0786acd0-7f6b-445e-9d5e-94432c551461";
     public readonly unitName:string = "Single address call limit";

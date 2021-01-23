@@ -1,10 +1,10 @@
 import { Transaction } from "thor-devkit";
 import { CalculateUnitCtx } from "../../../utils/calculateEngine/src/calculateEngine/baseCalculateUnit";
-import BaseRequestFilterUnit from "../baseRequestFilterUnit";
+import BaseRequestValidationUnit from "../baseRequestValidationUnit";
 import * as Joi from 'joi';
 import { ActionData, ActionResult } from "../../../utils/components/actionResult";
 
-export default class GasLimit extends BaseRequestFilterUnit{
+export default class GasLimit extends BaseRequestValidationUnit{
     
     public readonly unitID:string = "a6e7c2a0-e7a0-4b7c-926a-03e1c9c0acd0";
     public readonly unitName:string = "Gas Limit";

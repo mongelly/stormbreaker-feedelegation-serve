@@ -80,8 +80,8 @@ export default class CalculateConfigModel{
         return result;
     }
 
-    public async getCalculateInstanceConfig(appid:string):Promise<ActionData<{instanceid:string,instanceConfig:InstanceConfig}>>{
-        let result = new ActionData<{instanceid:string,instanceConfig:InstanceConfig}>();
+    public async getCalculateInstanceConfig(appid:string):Promise<ActionData<{configid:string,instanceConfig:InstanceConfig}>>{
+        let result = new ActionData<{configid:string,instanceConfig:InstanceConfig}>();
 
         try {
             let connection = getConnection();
@@ -93,7 +93,7 @@ export default class CalculateConfigModel{
             .getOne()
 
             if(data != undefined){
-                result.data = {instanceid:data.configid,instanceConfig:data.config}
+                result.data = {configid:data.configid,instanceConfig:data.config}
             }
             result.succeed = true;
         } catch (error) {

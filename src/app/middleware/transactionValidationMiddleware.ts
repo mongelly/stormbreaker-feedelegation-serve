@@ -9,13 +9,13 @@ import CalculateConfigModel from "../../server/calculate/calculateConfigModel";
 import CalculateLoader from "../../utils/calculateEngine/src/calculateEngine/calculateLoader";
 import CalculateEngine from "../../utils/calculateEngine/src/calculateEngine/calculateEngine";
 
-export class TransactionFilterMiddleware extends BaseMiddleware
+export class TransactionValidationMiddleware extends BaseMiddleware
 {
     constructor(env:any){
         super(env);
     }
 
-    public async transactionFilter(ctx:Router.IRouterContext,next:()=>Promise<any>){
+    public async transactionValidation(ctx:Router.IRouterContext,next:()=>Promise<any>){
         let appid = ctx.query.authorization;
 
         let configHelp = new CalculateConfigModel(this.environment);
@@ -28,7 +28,7 @@ export class TransactionFilterMiddleware extends BaseMiddleware
             let instanceConfig = (quaryResult.data.succeed[1] as ActionData<any>).data.instanceConfig;
             let resource:Array<string> = [
                 path.join(__dirname,"../../utils/calculateEngine/src/builtinUnits"),
-                path.join(__dirname,"../../server/requestFilter/units")];
+                path.join(__dirname,"../../server/requestValidation/units")];
 
             try {
                 let units = (await CalculateLoader.loadUnits(resource)).data!;

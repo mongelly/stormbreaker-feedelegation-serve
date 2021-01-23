@@ -1,10 +1,10 @@
 import { CalculateUnitCtx } from "../../../utils/calculateEngine/src/calculateEngine/baseCalculateUnit";
 import { ActionData, ActionResult } from "../../../utils/components/actionResult";
 import { HttpClientHelper } from "../../../utils/helper/httpClientHelper";
-import BaseRequestFilterUnit from "../baseRequestFilterUnit";
+import BaseRequestValidationUnit from "../baseRequestValidationUnit";
 import * as Joi from 'joi';
 
-export default class GoogleRecaptchaCheck extends BaseRequestFilterUnit {
+export default class GoogleRecaptchaCheck extends BaseRequestValidationUnit {
 
     public readonly unitID:string = "a99b8f65-0fec-4871-a195-97a7dbcbf416";
     public readonly unitName:string = "Google Recaptcha V3";
