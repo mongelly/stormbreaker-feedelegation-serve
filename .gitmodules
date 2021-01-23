@@ -1,0 +1,3 @@
+[submodule "src/utils/calculateEngine"]
+	path = src/utils/calculateEngine
+	url = git@github.com:mongelly/calculate-engine.git

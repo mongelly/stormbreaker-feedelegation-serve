@@ -1,11 +1,11 @@
-import { ICalculateTreeConfig } from "../../utils/calculateEngine/calculateTreeConfig";
 import { ActionData, ActionResult } from "../../utils/components/actionResult";
 import { CalculateTreeConfigEntity } from "./entities/calculateTreeConfig.entity";
 import {v4 as uuid} from 'uuid';
 import { DateEx } from "../../utils/extensions/dateEx";
 import { getConnection, getManager } from "typeorm";
-import { ICalculateInstanceConfig } from "../../utils/calculateEngine/calculateInstanceConfig";
 import { CalculateInstanceConfigEntity } from "./entities/calculateInstanceConfig.entity";
+import { TreeConfig } from "../../utils/calculateEngine/src/calculateEngine/treeConfig";
+import { InstanceConfig } from "../../utils/calculateEngine/src/calculateEngine/instanceConfig";
 
 export default class CalculateConfigModel{
 
@@ -13,8 +13,8 @@ export default class CalculateConfigModel{
         this.env = env;
     }
 
-    public async getCalculateTreeConfig(appid:string):Promise<ActionData<{configid:string,treeNodeConfig:ICalculateTreeConfig}>>{
-        let result = new ActionData<{configid:string,treeNodeConfig:ICalculateTreeConfig}>();
+    public async getCalculateTreeConfig(appid:string):Promise<ActionData<{configid:string,treeNodeConfig:TreeConfig}>>{
+        let result = new ActionData<{configid:string,treeNodeConfig:TreeConfig}>();
 
         try {
             let connection = getConnection();
@@ -37,7 +37,7 @@ export default class CalculateConfigModel{
         return result;
     }
 
-    public async saveCalculateTreeConfig(appid:string,treeconfig:ICalculateTreeConfig):Promise<ActionData<{configid:string}>>{
+    public async saveCalculateTreeConfig(appid:string,treeconfig:TreeConfig):Promise<ActionData<{configid:string}>>{
         let result = new ActionData<{configid:string}>();
 
         let config = new CalculateTreeConfigEntity();
@@ -80,8 +80,8 @@ export default class CalculateConfigModel{
         return result;
     }
 
-    public async getCalculateInstanceConfig(appid:string):Promise<ActionData<{instanceid:string,instanceConfig:ICalculateInstanceConfig}>>{
-        let result = new ActionData<{instanceid:string,instanceConfig:ICalculateInstanceConfig}>();
+    public async getCalculateInstanceConfig(appid:string):Promise<ActionData<{configid:string,instanceConfig:InstanceConfig}>>{
+        let result = new ActionData<{configid:string,instanceConfig:InstanceConfig}>();
 
         try {
             let connection = getConnection();
@@ -93,7 +93,7 @@ export default class CalculateConfigModel{
             .getOne()
 
             if(data != undefined){
-                result.data = {instanceid:data.instanceid,instanceConfig:data.config}
+                result.data = {configid:data.configid,instanceConfig:data.config}
             }
             result.succeed = true;
         } catch (error) {
@@ -104,11 +104,11 @@ export default class CalculateConfigModel{
         return result;
     }
 
-    public async saveCalculateInstanceConfig(appid:string,instaceConfig:ICalculateInstanceConfig):Promise<ActionData<{instanceid:string}>>{
+    public async saveCalculateInstanceConfig(appid:string,instaceConfig:InstanceConfig):Promise<ActionData<{instanceid:string}>>{
         let result = new ActionData<{instanceid:string}>();
 
         let config = new CalculateInstanceConfigEntity();
-        config.instanceid = uuid();
+        config.configid = uuid();
         config.appid = appid;
         config.createts = DateEx.getTimeStamp();
         config.updatets = config.createts;
@@ -118,7 +118,7 @@ export default class CalculateConfigModel{
         try {
             await getManager()
             .save(config);
-            result.data = {instanceid:config.instanceid}
+            result.data = {instanceid:config.configid}
             result.succeed = true;
         } catch (error) {
             result.error = new Error(`saveCalculateInstanceConfig faild: ${JSON.stringify(error)}`);

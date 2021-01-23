@@ -34,20 +34,33 @@ export class TxDelegatorHistoryModel{
         return result;
     }
 
-    public async selectHistoryByOriginAndSignTs(origin:string,starts:number,endts:number = DateEx.getTimeStamp(new Date()),includeClause:boolean = false,offset:number = 0,limit:number = 50):Promise<ActionData<{history:Array<TxBaseInfo>}>>{
-        let result = new ActionData<{history:Array<TxBaseInfo>}>()
+    public async selectHistroyByFilter(filter:TxFilter,includeClause:boolean = false):Promise<ActionData<{history:Array<TxBaseInfo>}>>{
+        let result = new ActionData<{history:Array<TxBaseInfo>}>();
 
         try {
             let connection = getConnection();
             let builder = connection
             .getRepository(TxBaseInfo)
             .createQueryBuilder("tx")
-            .where("tx.origin = :origin",{origin:origin.toLowerCase()})
-            .andWhere("tx.signts >= :starts",{starts:starts})
-            .andWhere("tx.signts <= :endts",{endts:endts})
-            .orderBy("tx.signts","DESC")
-            .limit(limit)
-            .offset(offset)
+            .innerJoin("tx.clauses","tx_delegation_clauses_index")
+            .where("tx.signts >= :starts",{starts:filter.starts})
+            .andWhere("tx.signts <= :endts",{endts:filter.endts});
+
+            if(filter.origins.length > 0){
+                builder.andWhere("tx.origin IN (:...origins)",{origins:filter.origins});
+            }
+
+            if(filter.delegators.length > 0){
+                builder.andWhere("tx.delegator IN (:...delegators)",{delegators:filter.delegators});
+            }
+
+            if(filter.toAddresses.length > 0){
+                builder.andWhere("tx_delegation_clauses_index.toaddress IN (:...toaddress)",{toaddress:filter.toAddresses});
+            }
+
+            builder.orderBy("tx.signts",filter.sort)
+            .limit(filter.limit)
+            .offset(filter.offset)
 
             if(includeClause){
                 builder.leftJoinAndSelect("tx.clauses","clause")
@@ -59,7 +72,45 @@ export class TxDelegatorHistoryModel{
             result.succeed = true;
 
         } catch (error) {
-            result.error = new Error(`selectHistoryByOriginAndSignTs faild: ${JSON.stringify(error)}`);
+            result.error = new Error(`selectHistroyByFilter faild: ${JSON.stringify(error)}`);
+            result.succeed = false;
+        }
+
+        return result;
+    }
+
+    public async selectHistoryCountByFilter(filter:TxFilter):Promise<ActionData<{count:number}>>{
+        let result = new ActionData<{count:number}>();
+
+        try {
+            let connection = getConnection();
+            let builder = await connection
+            .getRepository(TxBaseInfo)
+            .createQueryBuilder("tx")
+            .select("COUNT(tx.txid)","count")
+            .innerJoin("tx.clauses","tx_delegation_clauses_index")
+            .where("signts >= :starts",{starts:filter.starts})
+            .andWhere("signts <= :endts",{endts:filter.endts});
+            
+            if(filter.origins.length > 0){
+                builder.andWhere("tx.origin IN (:...origins)",{origins:filter.origins});
+            }
+
+            if(filter.delegators.length > 0){
+                builder.andWhere("tx.delegator IN (:...delegators)",{delegators:filter.delegators});
+            }
+
+            if(filter.toAddresses.length > 0){
+                builder.andWhere("tx_delegation_clauses_index.toaddress IN (:...toaddress)",{toaddress:filter.toAddresses});
+            }
+
+            let { count } = await builder.getRawOne();
+
+            result.data = {count:count};
+            result.succeed = true;
+
+        } catch (error) {
+            result.error = new Error(`selectHistoryCountByFilter faild: ${JSON.stringify(error)}`);
             result.succeed = false;
         }
 
@@ -134,4 +185,15 @@ export class TxDelegatorHistoryModel{
     }
 
     private env:any;
+}
+
+export class TxFilter {
+    public origins:Array<string> = new Array();
+    public delegators:Array<string> = new Array();
+    public toAddresses:Array<string> = new Array();
+    public starts:number = DateEx.getTimeStamp(new Date()) - 3600;
+    public endts:number = DateEx.getTimeStamp(new Date());
+    public limit:number = 50;
+    public offset:number = 0;
+    public sort:'ASC' | 'DESC' = 'ASC';
 }

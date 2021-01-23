@@ -2,19 +2,20 @@ import Router from "koa-router";
 import path from "path";
 import { BaseMiddleware } from "../../utils/components/baseMiddleware";
 import { ActionData, PromiseActionResult } from "../../utils/components/actionResult";
-import CalculateEngine from "../../utils/calculateEngine/calculateEngine";
 import { ThorDevKitEx } from "../../utils/extensions/thorDevkitExten";
 import ConvertJSONResponeMiddleware from "../../utils/middleware/convertJSONResponeMiddleware";
 import { SystemDefaultError } from "../../utils/components/error";
 import CalculateConfigModel from "../../server/calculate/calculateConfigModel";
+import CalculateLoader from "../../utils/calculateEngine/src/calculateEngine/calculateLoader";
+import CalculateEngine from "../../utils/calculateEngine/src/calculateEngine/calculateEngine";
 
-export class TransactionFilterMiddleware extends BaseMiddleware
+export class TransactionValidationMiddleware extends BaseMiddleware
 {
     constructor(env:any){
         super(env);
     }
 
-    public async transactionFilter(ctx:Router.IRouterContext,next:()=>Promise<any>){
+    public async transactionValidation(ctx:Router.IRouterContext,next:()=>Promise<any>){
         let appid = ctx.query.authorization;
 
         let configHelp = new CalculateConfigModel(this.environment);
@@ -25,38 +26,34 @@ export class TransactionFilterMiddleware extends BaseMiddleware
         if(quaryResult.succeed && quaryResult.data){
             let treeConfig = (quaryResult.data.succeed[0] as ActionData<any>).data.treeNodeConfig;
             let instanceConfig = (quaryResult.data.succeed[1] as ActionData<any>).data.instanceConfig;
-            let libraryPath:Array<string> = [
-                path.join(__dirname,"../../utils/calculateEngine/baseCalculateNode"),
-                path.join(__dirname,"../../server/requestFilter/nodes")];
+            let resource:Array<string> = [
+                path.join(__dirname,"../../utils/calculateEngine/src/builtinUnits"),
+                path.join(__dirname,"../../server/requestValidation/units")];
 
-            let calculateEngine = new CalculateEngine(this.environment);
-            let libraries = (await calculateEngine.loadCalculateLibrary(treeConfig,libraryPath)).data!;
-            let calculateNode = (await calculateEngine.createCalculate(treeConfig,instanceConfig,libraries)).data!;
-
-            let context = {
-                appid:appid,
-                txBody:ThorDevKitEx.decodeTxRaw(ctx.request.body.raw).body,
-                origin:(ctx.request.body.origin as string).toLowerCase(),
-                recaptcha:(ctx.query.recaptcha as string)
-            }
-            
             try {
-                let execResult = await calculateEngine.execCalculate<boolean>(context,calculateNode);
+                let units = (await CalculateLoader.loadUnits(resource)).data!;
+                let container = (await CalculateEngine.calculateUnitBuilder(this.environment,treeConfig,instanceConfig,units)).data!
+
+                let context = {
+                    appid:appid,
+                    txBody:ThorDevKitEx.decodeTxRaw(ctx.request.body.raw).body,
+                    origin:(ctx.request.body.origin as string).toLowerCase(),
+                    requestContext:ctx
+                }
+
+                let execResult = await container.exec(context);
                 if(execResult.succeed){
                     if(execResult.data){
                         await next();
                     } else {
                         ConvertJSONResponeMiddleware.errorJSONResponce(ctx,REFUSETOSIGN);
                     }
-                    
                 } else {
                     ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.INTERNALSERVERERROR);
                 }
             } catch (error) {
                 ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.INTERNALSERVERERROR);
             }
-        } else {
-            ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.INTERNALSERVERERROR);
         }
     }
 }

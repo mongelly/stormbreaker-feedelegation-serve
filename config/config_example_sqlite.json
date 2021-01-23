@@ -16,5 +16,6 @@
     },
     "remotesignserve":{
         "url":"http://localhost:18100"
-    }
+    },
+    "swagger":true
 }
