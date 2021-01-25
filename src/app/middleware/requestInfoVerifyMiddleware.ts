@@ -3,6 +3,7 @@ import * as Joi from 'joi';
 import { BaseMiddleware } from "../../utils/components/baseMiddleware";
 import { ThorDevKitEx } from "../../utils/extensions/thorDevkitExten";
 import ConvertJSONResponeMiddleware from "../../utils/middleware/convertJSONResponeMiddleware";
+import { SystemDefaultError } from "../../utils/components/error";
 
 export class RequestInfoVerifyMiddleware extends BaseMiddleware{
 
@@ -35,7 +36,7 @@ export class RequestInfoVerifyMiddleware extends BaseMiddleware{
                 ConvertJSONResponeMiddleware.errorJSONResponce(ctx,RequestInfoVerifyError.RAWINVALID);
             }
         } else {
-            ConvertJSONResponeMiddleware.errorJSONResponce(ctx,RequestInfoVerifyError.BADREQUEST);
+            ConvertJSONResponeMiddleware.errorJSONResponce(ctx,SystemDefaultError.BADREQUEST);
         }
     }
 }
@@ -45,5 +46,4 @@ export class RequestInfoVerifyError{
     public static INVALIDDELEGATETX = new Error("it's not delegate tx");
     public static CHAINTAGINVALID = new Error("chaintag invalid");
     public static RAWINVALID = new Error("raw invalid");
-    public static BADREQUEST = new Error("bad request");
 }
