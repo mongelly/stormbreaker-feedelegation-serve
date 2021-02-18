@@ -9,6 +9,7 @@ import * as Joi from 'joi';
 
 export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
 
+
     public readonly unitID:string = "0786acd0-7f6b-445e-9d5e-94432c551461";
     public readonly unitName:string = "Single address call limit";
 
@@ -32,15 +33,21 @@ export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
 
 
     public async checkCtx(ctx: CalculateUnitCtx): Promise<ActionResult> {
+        return await this.checkInstanceConfig(ctx.instanceConfig);
+    }
+
+    public async checkInstanceConfig(instanceConfig: any): Promise<ActionResult> {
+        if(instanceConfig == undefined){
+            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+        }
         const configSchema = Joi.object({
             callLimit:Joi.number().min(1).required(),
             timeInterval:Joi.number().min(1).required()
         }).required();
-        const verify = configSchema.validate(ctx.instanceConfig,{allowUnknown:true});
+        const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
             return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
         }
-
         return new ActionResult(true);
     }
 }

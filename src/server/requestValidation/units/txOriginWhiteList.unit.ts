@@ -4,7 +4,7 @@ import BaseRequestValidationUnit from "../baseRequestValidationUnit";
 import Joi from "joi";
 
 export default class TxOriginWhiteList extends BaseRequestValidationUnit {
-
+    
     public readonly unitID:string = "8052e3c7-0a00-4047-a53e-a27841db5dd7";
     public readonly unitName:string = "Tx origin whitelist";
 
@@ -17,8 +17,16 @@ export default class TxOriginWhiteList extends BaseRequestValidationUnit {
     }
 
     public async checkCtx(ctx: CalculateUnitCtx): Promise<ActionResult> {
+        return await this.checkInstanceConfig(ctx);
+    }
+
+    public async checkInstanceConfig(instanceConfig: any): Promise<ActionResult> {
+        if(instanceConfig == undefined){
+            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+        }
+
         const configSchema = Joi.array().items(Joi.string().lowercase().length(42).regex(/^(-0x|0x)[0-9a-f]*$/).required()).required();
-        const verify = configSchema.validate(ctx.instanceConfig,{allowUnknown:true});
+        const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
             return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
         }

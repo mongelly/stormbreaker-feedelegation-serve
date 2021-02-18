@@ -5,6 +5,7 @@ import BaseRequestValidationUnit from "../baseRequestValidationUnit";
 import * as Joi from 'joi';
 
 export default class GoogleRecaptchaCheck extends BaseRequestValidationUnit {
+    
 
     public readonly unitID:string = "a99b8f65-0fec-4871-a195-97a7dbcbf416";
     public readonly unitName:string = "Google Recaptcha V3";
@@ -14,26 +15,37 @@ export default class GoogleRecaptchaCheck extends BaseRequestValidationUnit {
         const recaptchaToken = ctx.context.requestContext.query.recaptcha;
 
         const verifyResult = await this.verifyAPI(secret,recaptchaToken);
-        if(verifyResult.succeed && verifyResult.data){
+        if(verifyResult.succeed && verifyResult.data == true){
             return new ActionData(true);
         } else {
-            return new ActionData(true);
+            return verifyResult;
         }
     }
 
     public async checkCtx(ctx: CalculateUnitCtx): Promise<ActionResult> {
+        const checkConfig = await this.checkInstanceConfig(ctx.instanceConfig);
+        if(checkConfig.succeed){
+            if(ctx.context.requestContext.query.recaptcha == undefined){
+                return new ActionResult(false,undefined,"",new Error(`not include recaptcha token`));
+            }
+            return new ActionResult(true);
+        } else {
+            return checkConfig;
+        }
+    }
+
+    public async checkInstanceConfig(instanceConfig: any|undefined): Promise<ActionResult> {
+        if(instanceConfig == undefined){
+            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+        }
+
         const configSchema = Joi.object({
             secret:Joi.string().required()
         }).required();
-        const verify = configSchema.validate(ctx.instanceConfig,{allowUnknown:true});
+        const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
             return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
         }
-        
-        if(ctx.context.requestContext.query.recaptcha == undefined){
-            return new ActionResult(false,undefined,"",new Error(`not include recaptcha token`));
-        }
-
         return new ActionResult(true);
     }
 

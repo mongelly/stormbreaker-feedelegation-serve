@@ -1,7 +1,7 @@
 import { Entity, PrimaryColumn, Column } from "typeorm";
 
-@Entity("authorization_info")
-export class AuthorizationInfo{
+@Entity("app_info")
+export class AppInfo{
 
     @PrimaryColumn({name:"appid",length:50})
     public appid!:string;

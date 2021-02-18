@@ -30,6 +30,14 @@ export default class SmartContractWhiteList extends BaseRequestValidationUnit{
     }
 
     public async checkCtx(ctx: CalculateUnitCtx): Promise<ActionResult> {
+        return await this.checkInstanceConfig(ctx.instanceConfig);
+    }
+
+    public async checkInstanceConfig(instanceConfig: any|undefined): Promise<ActionResult> {
+        if(instanceConfig == undefined){
+            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+        }
+
         const configSchema = Joi.object({
             smartcontract_whitelist:Joi.array().items({
                 address:Joi.string().lowercase().length(42).regex(/^(-0x|0x)[0-9a-f]*$/).required(),
@@ -37,12 +45,13 @@ export default class SmartContractWhiteList extends BaseRequestValidationUnit{
             })
         });
 
-        const verify = configSchema.validate(ctx.instanceConfig,{allowUnknown:true});
+        const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
             return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
         }
 
         return new ActionResult(true);
+
     }
 
 }

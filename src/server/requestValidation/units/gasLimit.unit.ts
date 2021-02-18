@@ -24,11 +24,19 @@ export default class GasLimit extends BaseRequestValidationUnit{
     }
 
     public async checkCtx(ctx: CalculateUnitCtx): Promise<ActionResult> {
+        return await this.checkInstanceConfig(ctx.instanceConfig);
+    }
+
+    public async checkInstanceConfig(instanceConfig: any|undefined): Promise<ActionResult> {
+        if(instanceConfig == undefined){
+            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+        }
+
         const configSchema = Joi.object({
             gas_limit:Joi.number().min(21000).required()
         }).required();
         
-        const verify = configSchema.validate(ctx.instanceConfig,{allowUnknown:true});
+        const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
             return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
         }
