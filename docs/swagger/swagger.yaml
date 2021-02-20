@@ -46,6 +46,36 @@ paths:
                schema:
                 $ref: '#/components/schemas/Signature'
 
+  /sign/try:
+    post:
+      tags:
+        - "Sign"
+      summary: "Test whether the transaction can be signed by the service"
+      parameters:
+        - in: query
+          name: authorization
+          schema:
+            type: string
+          required: true
+        - in: query
+          name: recaptcha
+          schema:
+            type: string
+          required: false
+      requestBody:
+        required: true
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/SignRequest'
+      responses:
+        '200':
+          description: OK
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/TryResult'
+
 components:
   schemas:
     SignRequest:
@@ -69,4 +99,45 @@ components:
             type: string
             format: bytes130
             example: 'f8fe82c74f9e1f5bf443f8a7f8eb968140f554968fdcab0a6ffe904e451c8b9244be44bccb1feb34dd20d9d8943f8c131227e55861736907b02d32c06b934d7200'
+    
+    TryResult:
+      description: the result of testing
+      properties:
+        canSign:
+          type: boolean
+          example: true
+        result:
+          type: object
+          $ref: '#/components/schemas/ResultItem'
+
+    ResultItem:
+      properties:
+        baseInfo:
+          type: object
+          properties:
+            instanceID:
+              type: string
+              format: uuid
+              example: '2dab7719-951d-4c1c-806a-57211dc8c131'
+            unitID:
+              type: string
+              format: uuid
+              example: '00000000-0000-0000-0001-3336ad58a20e'
+            unitName:
+              type: string
+              example: 'Builtin-AndUnit'
+        executed:
+          type: boolean
+          example: true
+        success:
+          type: boolean
+          example: true
+        result:
+          type: boolean
+          example: true
+        sub:
+          type: array
+          items:
+            type: object
+            $ref: '#/components/schemas/ResultItem'
 

@@ -2,7 +2,7 @@ import { ActionData, ActionResult } from "../../utils/components/actionResult";
 import { DateEx } from "../../utils/extensions/dateEx";
 import { TxBaseInfo } from "./entities/txBaseInfo.entity";
 import * as Devkit from 'thor-devkit';
-import { getConnection } from "typeorm";
+import { getConnection, getManager, getRepository } from "typeorm";
 import { ThorDevKitEx } from "../../utils/extensions/thorDevkitExten";
 import { TxClauseBaseInfo } from "./entities/txClauseBaseInfo.entity";
 
@@ -15,13 +15,9 @@ export class TxDelegatorHistoryModel{
         let result = new ActionData<{baseInfo:TxBaseInfo}>();
 
         try {
-            let connection = getConnection();
-            let baseInfo = await connection
-            .getRepository(TxBaseInfo)
-            .createQueryBuilder("tx")
-            .where("tx.txid = :txid",{txid:txid.toLowerCase()})
-            .leftJoinAndSelect("tx.clauses","clause")
-            .getOne();
+            let baseInfo = await getRepository(TxBaseInfo)
+            .findOne({where:{txid:txid}})
+
             if(baseInfo != undefined){
                 result.data = {baseInfo:baseInfo};
             }
@@ -34,7 +30,7 @@ export class TxDelegatorHistoryModel{
         return result;
     }
 
-    public async selectHistroyByFilter(filter:TxFilter,includeClause:boolean = false):Promise<ActionData<{history:Array<TxBaseInfo>}>>{
+    public async selectHistroyByFilter(appid:string,filter:TxFilter,includeClause:boolean = false):Promise<ActionData<{history:Array<TxBaseInfo>}>>{
         let result = new ActionData<{history:Array<TxBaseInfo>}>();
 
         try {
@@ -43,7 +39,8 @@ export class TxDelegatorHistoryModel{
             .getRepository(TxBaseInfo)
             .createQueryBuilder("tx")
             .innerJoin("tx.clauses","tx_delegation_clauses_index")
-            .where("tx.signts >= :starts",{starts:filter.starts})
+            .where("tx.appid = :appid",{appid:appid})
+            .andWhere("tx.signts >= :starts",{starts:filter.starts})
             .andWhere("tx.signts <= :endts",{endts:filter.endts});
 
             if(filter.origins.length > 0){
@@ -79,7 +76,7 @@ export class TxDelegatorHistoryModel{
         return result;
     }
 
-    public async selectHistoryCountByFilter(filter:TxFilter):Promise<ActionData<{count:number}>>{
+    public async selectHistoryCountByFilter(appid:string,filter:TxFilter):Promise<ActionData<{count:number}>>{
         let result = new ActionData<{count:number}>();
 
         try {
@@ -89,7 +86,8 @@ export class TxDelegatorHistoryModel{
             .createQueryBuilder("tx")
             .select("COUNT(tx.txid)","count")
             .innerJoin("tx.clauses","tx_delegation_clauses_index")
-            .where("signts >= :starts",{starts:filter.starts})
+            .where("tx.appid = :appid",{appid:appid})
+            .andWhere("signts >= :starts",{starts:filter.starts})
             .andWhere("signts <= :endts",{endts:filter.endts});
             
             if(filter.origins.length > 0){
@@ -117,34 +115,7 @@ export class TxDelegatorHistoryModel{
         return result;
     }
 
-    public async selectHistroyCountByOriginAndSignTs(origin:string,starts:number,endts:number = DateEx.getTimeStamp(new Date())):Promise<ActionData<{count:number}>>{
-        let result = new ActionData<{count:number}>();
-
-        try {
-            let connection = getConnection();
-            let { count } = await connection
-            .getRepository(TxBaseInfo)
-            .createQueryBuilder()
-            .select("COUNT(txid)","count")
-            .where("origin = :origin",{origin:origin.toLowerCase()})
-            .andWhere("signts >= :starts",{starts:starts})
-            .andWhere("signts <= :endts",{endts:endts})
-            .getRawOne();
-
-            if(count == undefined){
-                count = 0;
-            }
-            result.data = {count:parseInt(count)};
-            result.succeed = true;
-        } catch (error) {
-            result.error = new Error(`selectHistroyCountByOriginAndSignTs faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
-        }
-
-        return result;
-    }
-
-    public async insertTxDelegation(txBody:Devkit.Transaction.Body,origin:string,delegator:string):Promise<ActionResult>{
+    public async insertTxDelegation(appid:string,txBody:Devkit.Transaction.Body,origin:string,delegator:string):Promise<ActionResult>{
         let result = new ActionResult();
 
         let txid = ThorDevKitEx.calculateIDWithUnsigned(txBody,origin);
@@ -152,6 +123,7 @@ export class TxDelegatorHistoryModel{
         baseInfo.txid = txid;
         baseInfo.origin = origin;
         baseInfo.delegator = delegator;
+        baseInfo.appid = appid;
         baseInfo.gas = "0x" + BigInt(txBody.gas).toString(16);
         baseInfo.signts = DateEx.getTimeStamp();
         baseInfo.clauses = new Array();

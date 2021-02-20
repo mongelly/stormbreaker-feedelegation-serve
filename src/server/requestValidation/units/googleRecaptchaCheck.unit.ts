@@ -18,6 +18,8 @@ export default class GoogleRecaptchaCheck extends BaseRequestValidationUnit {
         if(verifyResult.succeed && verifyResult.data == true){
             return new ActionData(true);
         } else {
+            // DEBUG
+            // return new ActionData(true);
             return verifyResult;
         }
     }

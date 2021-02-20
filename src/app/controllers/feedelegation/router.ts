@@ -20,5 +20,11 @@ export default class FeeDelegationRouter extends BaseRouter
             (ctx,next) => transactionValidationMiddleware.transactionValidation(ctx,next),
             (ctx,next) => feeDelegationController.sign(ctx,next)
         );
+
+        this.post("/sign/try",
+            (ctx,next) => requestInfoVerifyMiddleware.vip201RequestVerify(ctx,next),
+            (ctx,next) => appVerificationMiddleware.appVerification(ctx,next),
+            (ctx,next) => feeDelegationController.trySign(ctx,next)
+        );
     }
 }

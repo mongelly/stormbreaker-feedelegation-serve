@@ -21,6 +21,9 @@ export class TxBaseInfo{
     @Column({name:"signts"})
     public signts!:number;
 
+    @Column({name:"appid"})
+    public appid!:string;
+
     @OneToMany(type => TxClauseBaseInfo,clause => clause.txInfo,{cascade:true})
     public clauses!:TxClauseBaseInfo[]
 }

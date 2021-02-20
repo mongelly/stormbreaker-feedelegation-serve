@@ -16,6 +16,7 @@ export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
     public async calculate(ctx: CalculateUnitCtx): Promise<ActionData<boolean>> {
         const config = ctx.instanceConfig as SingleAddressCallLimitConfig;
         const origin = ctx.context.origin.toLocaleLowerCase();
+        const appid = ctx.context.appid;
         const endTs = DateEx.getTimeStamp(new Date());
         const startTs = endTs - config.timeInterval;
         let filter = new TxFilter();
@@ -23,7 +24,7 @@ export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
         filter.starts = startTs;
         filter.endts = endTs;
         let historyHelper = new TxDelegatorHistoryModel(ctx.env);
-        let queryResult = await historyHelper.selectHistoryCountByFilter(filter);
+        let queryResult = await historyHelper.selectHistoryCountByFilter(appid,filter);
         if(queryResult.succeed && queryResult.data){
             return new ActionData(queryResult.data.count < config.callLimit);
         } else {
