@@ -5,7 +5,7 @@ import cors = require('koa2-cors');
 import { URLCodeMiddleware } from '../utils/middleware/uricodeMiddleware';
 import HttpLoggerMiddleware from '../utils/middleware/logMiddleware';
 
-export default class FeeDelegateionServer extends Koa
+export default class ApiServer extends Koa
 {
     public constructor(env:any){
         super();

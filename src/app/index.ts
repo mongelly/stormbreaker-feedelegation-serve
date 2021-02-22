@@ -1,6 +1,6 @@
 import path from "path";
 import ActiveSupportServices from "./activeSupportService";
-import FeeDelegateionServer from "./feedelegationServer";
+import ApiServer from "./apiServer";
 import Environment from "./environment";
 import { initErrorMap } from "./initErrorMap";
 import NetworkHelper from "../utils/helper/networkHelper";
@@ -20,7 +20,7 @@ export let environment = globalEnvironment;
 (new ActiveSupportServices()).activieSupportServices().then(action => {
     if(action.succeed){
         let port = environment.config.port;
-        let app = new FeeDelegateionServer(environment);
+        let app = new ApiServer(environment);
         app.listen(port);
         console.info(`${config.serviceName} active successful`);
         console.info(`Server run at:\r\n - Local: http://localhost:${port} \r\n - Network: http://${NetworkHelper.geIPAddress()}:${port}`);
