@@ -18,14 +18,14 @@ initErrorMap();
 export let environment = globalEnvironment;
 
 (new ActiveSupportServices()).activieSupportServices().then(action => {
-    if(action.succeed){
+    if(action.error == undefined){
         let port = environment.config.port;
         let app = new ApiServer(environment);
         app.listen(port);
         console.info(`${config.serviceName} active successful`);
         console.info(`Server run at:\r\n - Local: http://localhost:${port} \r\n - Network: http://${NetworkHelper.geIPAddress()}:${port}`);
     } else {
-        console.error("Support Active Faild: " + action.message);
+        console.error("Support Active Faild: " + JSON.stringify(action.error));
         process.exit();
     }
 }).catch(error => {

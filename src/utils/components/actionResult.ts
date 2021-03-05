@@ -1,21 +1,15 @@
 export class ActionResult {
-    public succeed: boolean = false;
-    public code: string | undefined;
-    public message: string = "";
-    public error: any;
+    public error: any|Error;
+    public detail:any
 
     public copyBase(source: ActionResult) {
-        this.succeed = source.succeed;
-        this.code = source.code;
-        this.message = source.message;
         this.error = source.error;
+        this.detail = source.detail;
     }
 
-    public constructor(succeed: boolean = false, code: string | undefined = undefined, msg: string = "", error: any = null) {
-        this.succeed = succeed;
-        this.code = code;
-        this.message = msg;
+    public constructor(error:any|Error = undefined,detail:any = undefined) {
         this.error = error;
+        this.detail = detail;
     }
 }
 
@@ -23,7 +17,7 @@ export class ActionData<T> extends ActionResult {
     public data: T | undefined;
 
     public constructor(data?: T) {
-        super(data == undefined ? false : true);
+        super();
         this.data = data;
     }
 
@@ -33,13 +27,12 @@ export class ActionData<T> extends ActionResult {
             succeed: new Array<ActionResult>(),
             failed: new Array<ActionResult>()
         };
-        result.succeed = true;
         for (const sub of actions) {
-            if (sub.succeed) {
+            if (sub.error == undefined) {
                 result.data.succeed.push(sub);
             } else {
                 result.data.failed.push(sub);
-                result.succeed = false;
+                result.error = new Error("has error action");
             }
         }
         return result;
@@ -53,15 +46,14 @@ export class PromiseActionResult {
             succeed: new Array<ActionResult>(),
             failed: new Array<ActionResult>()
         };
-        result.succeed = true;
         let promiseAllResult = await promise;
         if (promiseAllResult.constructor.name == "Array") {
             for (let subResult of (promiseAllResult as Array<ActionResult>)) {
-                if (subResult.succeed) {
+                if (subResult.error == undefined) {
                     result.data.succeed.push(subResult);
                 } else {
                     result.data.failed.push(subResult);
-                    result.succeed = false;
+                    result.error = new Error("has error action");
                 }
             }
         } else if (typeof (promiseAllResult) == typeof (ActionResult)) {
@@ -70,7 +62,7 @@ export class PromiseActionResult {
                 result.data.succeed.push(promiseAllResult);
             } else {
                 result.data.failed.push(promiseAllResult);
-                result.succeed = false;
+                result.error = new Error("has error action");
             }
         }
         return result;

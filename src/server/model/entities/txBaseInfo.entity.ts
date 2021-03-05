@@ -24,6 +24,9 @@ export class TxBaseInfo{
     @Column({name:"appid"})
     public appid!:string;
 
+    @Column({name:"status", default:0})
+    public status!:number;
+
     @OneToMany(type => TxClauseBaseInfo,clause => clause.txInfo,{cascade:true})
     public clauses!:TxClauseBaseInfo[]
 }

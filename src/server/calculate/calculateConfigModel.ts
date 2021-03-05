@@ -28,10 +28,8 @@ export default class CalculateConfigModel{
             if(data != undefined){
                 result.data = {configid:data.configid,treeNodeConfig:data.config}
             }
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`getCalculateTreeConfig faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -51,11 +49,9 @@ export default class CalculateConfigModel{
         try {
             await getManager()
             .save(config);
-            result.data = {configid:config.configid}
-            result.succeed = true;
+            result.data = {configid:config.configid};
         } catch (error) {
             result.error = new Error(`saveCalculateTreeConfig faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -74,7 +70,6 @@ export default class CalculateConfigModel{
             .execute()
         } catch (error) {
             result.error = new Error(`removeCalculateTreeConfig faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -95,10 +90,8 @@ export default class CalculateConfigModel{
             if(data != undefined){
                 result.data = {configid:data.configid,instanceConfig:data.config}
             }
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`getCalculateInstanceConfig faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -119,10 +112,8 @@ export default class CalculateConfigModel{
             await getManager()
             .save(config);
             result.data = {instanceid:config.configid}
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`saveCalculateInstanceConfig faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -141,7 +132,6 @@ export default class CalculateConfigModel{
             .execute()
         } catch (error) {
             result.error = new Error(`removeCalculateInstanceConfig faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;

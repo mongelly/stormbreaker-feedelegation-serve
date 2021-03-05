@@ -20,13 +20,11 @@ export class RemoteSignServe implements iSignServe{
             origin:origin
         }
         let requestResult = await httpClient.request(apiUrl,"POST",undefined,undefined,body);
-        if(requestResult.succeed && requestResult.data != undefined){
+        if(requestResult.error != undefined && requestResult.data != undefined){
             let signature = requestResult.data.body["signature"] as string;
             result.data = { signature: HexStringHelper.ConvertToBuffer(signature) };
-            result.succeed = true
         } else {
             result.error = AppErrorDefine.SIGNFAILD;
-            result.succeed = false;
         }
         return result;
     }

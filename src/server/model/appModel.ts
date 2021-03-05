@@ -22,10 +22,8 @@ export default class AppModel{
             await getManager()
             .save(info);
             result.data = {app:info};
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`registerNewApp faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
         return result;
     }
@@ -38,10 +36,8 @@ export default class AppModel{
             if(appInfo != undefined){
                 result.data = {app:appInfo};
             }
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`getAppInfo faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -58,10 +54,8 @@ export default class AppModel{
             .set({valid:false})
             .where("appid = :appid",{appid:appid})
             .execute();
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`removeAppInfo faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;

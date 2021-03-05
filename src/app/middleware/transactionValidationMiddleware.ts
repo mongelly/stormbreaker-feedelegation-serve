@@ -23,7 +23,7 @@ export class TransactionValidationMiddleware extends BaseMiddleware
         let getInstanceConfigPromise = configHelp.getCalculateInstanceConfig(appid);
 
         let quaryResult = await PromiseActionResult.PromiseActionResult(Promise.all([getTreeNodeConfigPromise,getInstanceConfigPromise]));
-        if(quaryResult.succeed && quaryResult.data){
+        if(quaryResult.error != undefined && quaryResult.data){
             let treeConfig = (quaryResult.data.succeed[0] as ActionData<any>).data.treeNodeConfig;
             let instanceConfig = (quaryResult.data.succeed[1] as ActionData<any>).data.instanceConfig;
             let resource:Array<string> = [
@@ -42,7 +42,7 @@ export class TransactionValidationMiddleware extends BaseMiddleware
                 }
 
                 let execResult = await container.exec(context);
-                if(execResult.succeed){
+                if(execResult.error != undefined){
                     if(execResult.data){
                         await next();
                     } else {

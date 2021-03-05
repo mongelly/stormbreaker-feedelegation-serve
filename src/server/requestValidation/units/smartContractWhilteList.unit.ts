@@ -35,7 +35,7 @@ export default class SmartContractWhiteList extends BaseRequestValidationUnit{
 
     public async checkInstanceConfig(instanceConfig: any|undefined): Promise<ActionResult> {
         if(instanceConfig == undefined){
-            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+            return new ActionResult(new Error(`instanceConfig undefined`));
         }
 
         const configSchema = Joi.object({
@@ -47,7 +47,7 @@ export default class SmartContractWhiteList extends BaseRequestValidationUnit{
 
         const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
-            return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
+            return new ActionResult(new Error(`instanceConfig invalid`));
         }
 
         return new ActionResult(true);

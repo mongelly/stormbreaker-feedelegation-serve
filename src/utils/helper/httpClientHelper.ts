@@ -14,20 +14,15 @@ export class HttpClientHelper{
                     body:response.data,
                     headers:response.headers
                 }
-                result.succeed = true;
             } catch (error) {
                 if(error.isAxiosError){
-                    result.succeed = false;
-                    result.code = String(error.response.status || "")
-                    result.message = String(error.response.data || "");
                     result.error = error;
+                    result.detail = {status:error.response.status || "",data:error.response.data || ""};
                 } else {
-                    result.succeed = false;
-                    result.code = "500";
                     result.error = error;
+                    result.detail = {status:500 || "",data:error.response.data || ""};
                 }
             }
-
             return result;
         }
 }

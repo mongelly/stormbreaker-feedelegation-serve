@@ -21,10 +21,8 @@ export class TxDelegatorHistoryModel{
             if(baseInfo != undefined){
                 result.data = {baseInfo:baseInfo};
             }
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`selectHistoryByTxid faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -66,11 +64,9 @@ export class TxDelegatorHistoryModel{
             let baseinfos = await builder.getMany();
 
             result.data = {history:baseinfos};
-            result.succeed = true;
 
         } catch (error) {
             result.error = new Error(`selectHistroyByFilter faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -105,11 +101,9 @@ export class TxDelegatorHistoryModel{
             let { count } = await builder.getRawOne();
 
             result.data = {count:count};
-            result.succeed = true;
 
         } catch (error) {
             result.error = new Error(`selectHistoryCountByFilter faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;
@@ -147,10 +141,8 @@ export class TxDelegatorHistoryModel{
                     await tran.save(clause);
                 }
             });
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`insertTxDelegation faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;

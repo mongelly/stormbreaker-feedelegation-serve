@@ -22,13 +22,13 @@ export default class TxOriginWhiteList extends BaseRequestValidationUnit {
 
     public async checkInstanceConfig(instanceConfig: any): Promise<ActionResult> {
         if(instanceConfig == undefined){
-            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+            return new ActionResult(new Error(`instanceConfig undefined`));
         }
 
         const configSchema = Joi.array().items(Joi.string().lowercase().length(42).regex(/^(-0x|0x)[0-9a-f]*$/).required()).required();
         const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
-            return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
+            return new ActionResult(new Error(`instanceConfig invalid`));
         }
         return new ActionResult(true);
     }

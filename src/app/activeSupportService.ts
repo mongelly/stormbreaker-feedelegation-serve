@@ -15,19 +15,16 @@ export default class ActiveSupportServices implements IActiveSupportServices{
             const connection = await createConnection(connectionOptions);
             if(connection.isConnected){
                 await connection.synchronize();
-                result.succeed = true;
             } else {
                 let errorMsg = `DataBase [db:${JSON.stringify(environment.config.dbConfig)}] initialize faild`;
                 console.error(errorMsg)
                 result.error = errorMsg;
-                result.succeed = false;
                 return result;
             }
         } catch (error) {
             let errorMsg = `DataBase [db:${JSON.stringify(environment.config.dbConfig)}] initialize faild`;
             console.error(errorMsg)
             result.error = errorMsg;
-            result.succeed = false;
             return result;
         }
         return result;

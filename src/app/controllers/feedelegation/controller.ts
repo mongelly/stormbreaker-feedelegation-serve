@@ -28,13 +28,13 @@ export default class FeeDelegationController extends BaseMiddleware{
             let appid = ctx.query.authorization;
 
             let loadDelegatorResult = await (new DelegatorManagerModel(this.environment)).getDelegator(appid);
-            if(loadDelegatorResult.succeed && loadDelegatorResult.data != undefined && loadDelegatorResult.data.delegator != undefined){
+            if(loadDelegatorResult.error == undefined && loadDelegatorResult.data != undefined && loadDelegatorResult.data.delegator != undefined){
                 let removeServe:iSignServe = new RemoteSignServe(this.environment);
                 let signResult = await removeServe.sign(raw,origin,loadDelegatorResult.data.delegator);
-                if(signResult.succeed){
+                if(signResult.error == undefined){
                     let transaction = ThorDevKitEx.decodeTxRaw(raw);
                     let saveLogResult = await (new TxDelegatorHistoryModel(this.environment)).insertTxDelegation(appid,transaction.body,origin,loadDelegatorResult.data.delegator);
-                    if(saveLogResult.succeed){
+                    if(saveLogResult.error == undefined){
                         let signature = signResult.data!.signature;
                         this.convertSignJSONResult(ctx,"0x" + signature.toString("hex"));
                     } else {
@@ -57,7 +57,7 @@ export default class FeeDelegationController extends BaseMiddleware{
             let getInstanceConfigPromise = configHelp.getCalculateInstanceConfig(appid);
 
             let quaryResult = await PromiseActionResult.PromiseActionResult(Promise.all([getTreeNodeConfigPromise,getInstanceConfigPromise]));
-            if(quaryResult.succeed && quaryResult.data){
+            if(quaryResult.error == undefined && quaryResult.data){
                 let treeConfig = (quaryResult.data.succeed[0] as ActionData<any>).data.treeNodeConfig;
                 let instanceConfig = (quaryResult.data.succeed[1] as ActionData<any>).data.instanceConfig;
                 let resource:Array<string> = [
@@ -76,7 +76,7 @@ export default class FeeDelegationController extends BaseMiddleware{
                     }
 
                     let execResult = await container.exec(context);
-                    if(execResult.succeed){
+                    if(execResult.error == undefined){
                         let response = {
                             canSign:execResult.data,
                             result:this.convertContainerResultsToJson(container.containerResult)
@@ -103,7 +103,7 @@ export default class FeeDelegationController extends BaseMiddleware{
         let json = {
             baseInfo:result.baseInfo,
             executed:result.executed,
-            success:result.result.succeed,
+            success:result.result.error == undefined ? true : false,
             result:(result.result as ActionData<any>).data,
             error:result.result.error || undefined,
             sub:new Array()

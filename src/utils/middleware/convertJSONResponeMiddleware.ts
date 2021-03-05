@@ -8,7 +8,7 @@ export var errorMap:Map<Error,{status:number,err:any}> = new Map<Error,{status:n
 export default class ConvertJSONResponeMiddleware extends BaseMiddleware{
 
     public static actionResultJSONResponse(ctx:Router.IRouterContext,action:ActionResult,resultData?:any){
-        if(action.succeed){
+        if(action.error == undefined){
             this.bodyToJSONResponce(ctx,resultData);
         } else {
             this.errorJSONResponce(ctx,action.error);

@@ -25,7 +25,7 @@ export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
         filter.endts = endTs;
         let historyHelper = new TxDelegatorHistoryModel(ctx.env);
         let queryResult = await historyHelper.selectHistoryCountByFilter(appid,filter);
-        if(queryResult.succeed && queryResult.data){
+        if(queryResult.error == undefined && queryResult.data){
             return new ActionData(queryResult.data.count < config.callLimit);
         } else {
             return new ActionData(false);
@@ -39,7 +39,7 @@ export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
 
     public async checkInstanceConfig(instanceConfig: any): Promise<ActionResult> {
         if(instanceConfig == undefined){
-            return new ActionResult(false,undefined,"",new Error(`instanceConfig undefined`));
+            return new ActionResult(new Error(`instanceConfig undefined`));
         }
         const configSchema = Joi.object({
             callLimit:Joi.number().min(1).required(),
@@ -47,7 +47,7 @@ export default class SingleAddressCallLimit extends BaseRequestValidationUnit {
         }).required();
         const verify = configSchema.validate(instanceConfig,{allowUnknown:true});
         if(verify.error != undefined || verify.errors != undefined){
-            return new ActionResult(false,undefined,"",new Error(`instanceConfig invalid`));
+            return new ActionResult(new Error(`instanceConfig invalid`));
         }
         return new ActionResult(true);
     }

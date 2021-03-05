@@ -21,10 +21,8 @@ export default class DelegatorManagerModel{
             if(data != undefined){
                 result.data = { delegator: data.delegator};
             }
-            result.succeed = true;
         } catch (error) {
             result.error = new Error(`getDelegator faild: ${JSON.stringify(error)}`);
-            result.succeed = false;
         }
 
         return result;

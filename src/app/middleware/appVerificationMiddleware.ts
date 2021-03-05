@@ -10,7 +10,7 @@ export class AppVerificationMiddleware extends BaseMiddleware
         if(appid != undefined){
             let am = new AppModel(this.environment);
             let getInfoResult = await am.getAppInfo(appid);
-            if(getInfoResult.succeed && getInfoResult.data != undefined){
+            if(getInfoResult.error != undefined && getInfoResult.data != undefined){
                 await next();
             } else {
                 ConvertJSONResponeMiddleware.errorJSONResponce(ctx,AppVerifactionError.APPIDINVALID);
