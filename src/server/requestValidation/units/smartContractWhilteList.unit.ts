@@ -14,10 +14,12 @@ export default class SmartContractWhiteList extends BaseRequestValidationUnit{
             for (const clause of ctx.context.txBody.clauses) {
                 let item = config.smartcontract_whitelist.filter(value => {return value.address.toLowerCase() == clause.to!.toLocaleLowerCase();})[0];
                 if(item != undefined){
-                    if(item.functionHashs.length > 0){
+                    if(item.functionHashs != undefined && item.functionHashs.length > 0){
                         if(item.functionHashs.filter(hash => {return clause.data.length >= 10 && hash.toLowerCase() == clause.data.substr(0,10).toLowerCase()}).length == 0){
                             return new ActionData(false);
                         }
+                    } else {
+                        return new ActionData(true);
                     }
                 } else {
                     return new ActionData(false);
